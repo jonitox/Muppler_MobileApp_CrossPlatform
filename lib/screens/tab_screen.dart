@@ -111,7 +111,7 @@ class _TabScreenState extends State<TabScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.fitness_center),
-            title: Text('종d목'),
+            title: Text('종목'),
             // label: '종목',
           ),
         ],
