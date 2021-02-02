@@ -83,7 +83,15 @@ class HomeScreen extends StatelessWidget {
     return Column(
       children: [
         Text('${DateFormat.Md().format(DateTime.now())}'),
-        Text('오늘의 운동'),
+        Row(
+          children: [
+            Text('오늘의 운동'),
+            RaisedButton(
+              onPressed: (null),
+              child: Text('계획 관리하러가기!'),
+            ),
+          ],
+        ),
         _todayEvents.length > 0
             ? _buildTodayEvents(context, _todayEvents)
             : Text('계획한 운동이 없습니다.'),
