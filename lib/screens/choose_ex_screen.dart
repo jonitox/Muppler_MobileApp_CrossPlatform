@@ -68,7 +68,7 @@ class _ChooseExScreenState extends State<ChooseExScreen> {
           children: [
             Row(
               children: [
-                Text('종목을 선택하세요'),
+                Text('종목을 선택하세요.'),
                 RaisedButton(
                   child: Text('추가/관리'),
                   onPressed: () => widget._routeManageScreen().then((_) {
