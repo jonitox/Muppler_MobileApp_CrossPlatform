@@ -88,7 +88,7 @@ class HomeScreen extends StatelessWidget {
             Text('오늘의 운동'),
             RaisedButton(
               onPressed: (null),
-              child: Text('계획 관리하러가기!'),
+              child: Text('계획 관리하러가기'),
             ),
           ],
         ),
