@@ -14,3 +14,4 @@ A new Flutter project.
 - Android/Ios 분리    
 - 지원 모드 지정.    
 - tab화면 이동시 기존변수들 유지. 
+- performance 최적화(build함수내 print활용하여별 동작별 위젯의 빌드여부 확인.)
