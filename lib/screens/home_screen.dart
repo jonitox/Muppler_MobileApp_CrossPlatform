@@ -74,7 +74,9 @@ class HomeScreen extends StatelessWidget {
         day1.day == day2.day;
   }
 
-  void _tapTodayEvents() {}
+  void _tapTodayEvents() {
+    //
+  }
 
   @override
   Widget build(BuildContext context) {
