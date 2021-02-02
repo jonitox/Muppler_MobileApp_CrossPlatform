@@ -1,7 +1,7 @@
 # workOut_Tracker
 
 A new Flutter project.
-기능: 운동 종목별 기록 tracking.
+기능: 운동 종목별 기록 tracking. / 내가 하는 운동 종목들만 관리 가능.
 
 
 # To do    
