@@ -1,16 +1,16 @@
-# work_out_tracker
+# workOut_Tracker
 
 A new Flutter project.
+기능: 운동 종목별 기록 tracking.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# To do    
+- 디자인 변경 및 theme 추가   
+- 애니메이션 추가  (event Tile(축소/확대),)    
+- 폰트 추가      
+- db 관리   
+- 달력에 종목별 표기 버튼 및 달력rendering.   
+- 로딩페이지 구현.(로고 애니메이션 / 스크린 이동버튼)    
+- Android/Ios 분리    
+- 지원 모드 지정.    
+- tab화면 이동시 기존변수들 유지. 
