@@ -74,9 +74,7 @@ class HomeScreen extends StatelessWidget {
         day1.day == day2.day;
   }
 
-  void _tapTodayEvents() {
-    re;
-  }
+  void _tapTodayEvents() {}
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +82,7 @@ class HomeScreen extends StatelessWidget {
     final _todayEvents =
         _events.where((test) => _isSameDay(test.date, today)).toList();
 
-    return Column(s
+    return Column(
       children: [
         Text('${DateFormat.Md().format(DateTime.now())}'),
         Row(
