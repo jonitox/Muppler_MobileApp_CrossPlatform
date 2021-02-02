@@ -106,7 +106,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text('종목:'),
-              _selectedEx != null ? Text(_selectedEx) : Text('_unselected_'),
+              _selectedEx != null ? Text(_selectedEx) : Text('unselected!'),
               IconButton(
                 icon: Icon(Icons.edit),
                 onPressed: _tapChooseEx,
