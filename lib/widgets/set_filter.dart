@@ -14,7 +14,7 @@ class _SetFilterState extends State<SetFilter> {
   @override
   void initState() {
     _newFilters = widget._exList.map((ex) => widget._filters[ex]).toList();
-
+    _newFilters.add(widget._filters['undefined']);
     // _newFilters.add(widget._filters['undefined']);
     super.initState();
   }
@@ -54,7 +54,9 @@ class _SetFilterState extends State<SetFilter> {
               child: ListView.builder(
                 itemCount: _newFilters.length,
                 itemBuilder: (ctx, idx) => SwitchListTile(
-                  title: Text(widget._exList[idx]),
+                  title: Text(idx < widget._exList.length
+                      ? widget._exList[idx]
+                      : '등록되지않은 운동'),
                   value: _newFilters[idx],
                   onChanged: (value) => setState(() {
                     _newFilters[idx] = value;

@@ -7,13 +7,16 @@ class EventList extends StatelessWidget {
   final List selectedEvents;
   final bool isDateVisible;
   final bool isDeleteVisible;
+  final bool isEditVisible;
   final Function deleteEvent;
-
+  final Function editEvent;
   EventList({
     @required this.selectedEvents,
     this.isDateVisible = false,
     this.deleteEvent,
     this.isDeleteVisible = true,
+    this.isEditVisible = false,
+    this.editEvent,
   });
 
   // build Event Tile
@@ -36,7 +39,11 @@ class EventList extends StatelessWidget {
               // mainAxisAlignment: MainAxis,
               children: [
                 Expanded(child: Center(child: Text(event.exercise))),
-                if (isDeleteVisible) Icon(Icons.edit),
+                if (isEditVisible)
+                  IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () => editEvent(event),
+                  ),
                 if (isDeleteVisible)
                   IconButton(
                     icon: Icon(Icons.delete),

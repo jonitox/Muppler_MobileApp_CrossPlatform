@@ -24,6 +24,7 @@ class _ManageScreenState extends State<ManageScreen> {
     super.initState();
   }
 
+  // tap add new Exercise
   void _tapAddNewEx() {
     showDialog(
       context: context,
@@ -32,24 +33,28 @@ class _ManageScreenState extends State<ManageScreen> {
     );
   }
 
+  // add new Exercise, // call back through NewExercise dialog
   void _addNewEx(String ex) {
     setState(() {
       widget.addEx(ex);
     });
   }
 
+  // delete Exercise
   void _deleteEx(int idx) {
     setState(() {
       widget.deleteEx(idx, false);
     });
   }
 
+  // edit Exercise
   void _editEx(int idx) {
     setState(() {
       // ..
     });
   }
 
+  // build each Exercise Tile.
   Widget _buildExTile(int idx) {
     return Row(
       children: [
@@ -66,6 +71,7 @@ class _ManageScreenState extends State<ManageScreen> {
     );
   }
 
+  // pop manage screen
   void _popScreen() {
     // 안해도됨. 생성자자로 받은게 객체가 아니라 주소이므로.
     // if (_newExList != widget._oldExList) widget._updateExList(_newExList);

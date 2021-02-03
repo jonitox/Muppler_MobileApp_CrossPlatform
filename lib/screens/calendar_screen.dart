@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../models/event.dart';
@@ -11,8 +12,18 @@ class CalendarScreen extends StatefulWidget {
   final Map<String, bool> _filters;
   final List<String> _exLists;
   final Function deleteEvent;
-  CalendarScreen(this._events, this._filters, this._routeAddEventScreen,
-      this._exLists, this.deleteEvent);
+
+  // final DateTime selectedDay;
+  // final Function switchSelectedDay;
+  CalendarScreen(
+    // this.selectedDay,
+    this._events,
+    this._filters,
+    this._routeAddEventScreen,
+    this._exLists,
+    this.deleteEvent,
+  );
+  // this.switchSelectedDay);
 
   @override
   _CalendarScreenState createState() => _CalendarScreenState();
@@ -25,7 +36,6 @@ class _CalendarScreenState extends State<CalendarScreen>
   CalendarController _calendarController;
   AnimationController _animationController;
   Map<DateTime, List> _filteredEvents = {};
-
   // // Example holidays
   // final Map<DateTime, List> _holidays = {
   //   DateTime(2021, 1, 1): ['New Year\'s Day'],
@@ -35,7 +45,10 @@ class _CalendarScreenState extends State<CalendarScreen>
   void _filteringEvents() {
     _filteredEvents.clear();
     widget._events.forEach((test) {
-      if (widget._filters[test.exercise] == true) {
+      if ((widget._filters.containsKey(test.exercise) &&
+              widget._filters[test.exercise] == true) ||
+          !widget._filters.containsKey(test.exercise) &&
+              widget._filters['undefined'] == true) {
         if (_filteredEvents[test.date] == null) {
           _filteredEvents[test.date] = [];
         }
@@ -54,6 +67,7 @@ class _CalendarScreenState extends State<CalendarScreen>
       if (ret != null) {
         setState(() {
           final List<bool> newFilters = ret;
+          widget._filters['undefined'] = newFilters.removeLast();
           newFilters.asMap().entries.forEach((entry) {
             final ex = widget._exLists[entry.key];
             widget._filters[ex] = entry.value;
@@ -68,7 +82,9 @@ class _CalendarScreenState extends State<CalendarScreen>
 
   // tap add Event button
   void _tapAddEvent() {
-    widget._routeAddEventScreen(_calendarController.selectedDay).then((ret) {
+    widget
+        ._routeAddEventScreen(date: _calendarController.selectedDay)
+        .then((ret) {
       if (ret != null) {
         setState(() {
           widget._events.add(ret as Event);
@@ -89,10 +105,28 @@ class _CalendarScreenState extends State<CalendarScreen>
     });
   }
 
+  // edit event
+  void _editEvent(Event old) {
+    widget._routeAddEventScreen(oldEvent: old).then((ret) {
+      if (ret != null) {
+        setState(() {
+          widget._events.removeWhere((test) => test.id == old.id);
+          widget._events.add(ret as Event);
+          _filteringEvents();
+          _selectedEvents =
+              _filteredEvents[_calendarController.selectedDay] ?? [];
+        });
+      }
+    });
+  }
+
   //  onDaySelected
   void _onDaySelected(DateTime day, List events, List holidays) {
     setState(() {
       _selectedEvents = events;
+      // _selectedDay = _calendarController.selectedDay;
+      // widget.switchSelectedDay(_selectedDay);
+      print('set selectedDay!');
     });
   }
 
@@ -101,7 +135,6 @@ class _CalendarScreenState extends State<CalendarScreen>
     // _selectedEvents = widget._events[_calendarController.selectedDay] ?? [];
   }
 
-  // more: tabscreen이동시 _selectedDay 고정 => tab_screen에서 _selectedDay관리, 여기로 data전달
   // initState
   @override
   void initState() {
@@ -145,12 +178,20 @@ class _CalendarScreenState extends State<CalendarScreen>
         const SizedBox(height: 8.0),
         _buildButtons(),
         const SizedBox(height: 8.0),
-        Expanded(
-          child: EventList(
-            selectedEvents: _selectedEvents,
-            deleteEvent: _deleteEvent,
-          ),
-        ),
+        Text(DateFormat.Md()
+                .format(_calendarController.selectedDay ?? DateTime.now())
+                .toString() +
+            '의 운동 계획'), // more: tab의 _selectDay 값으로 변경.
+        _selectedEvents.length > 0
+            ? Expanded(
+                child: EventList(
+                  selectedEvents: _selectedEvents,
+                  deleteEvent: _deleteEvent,
+                  editEvent: _editEvent,
+                  isEditVisible: true,
+                ),
+              )
+            : Text('오늘 계획된 운동이 없습니다!'),
       ],
     );
   }
@@ -161,6 +202,7 @@ class _CalendarScreenState extends State<CalendarScreen>
       locale: 'ko_KR',
       calendarController: _calendarController,
       events: _filteredEvents,
+      // initialSelectedDay: _selectedDay,
       // holidays: _holidays,
       initialCalendarFormat: CalendarFormat.month,
       formatAnimation: FormatAnimation.slide,

@@ -7,7 +7,15 @@ class TrackingScreen extends StatefulWidget {
   final List<Event> _events;
   final Function _routeChooseExScreen;
   final Function deleteEvent;
-  TrackingScreen(this._events, this._routeChooseExScreen, this.deleteEvent);
+  final List<String> _exList;
+  // final String selectedEx;
+  TrackingScreen(
+    // this.selectedEx,
+    this._events,
+    this._routeChooseExScreen,
+    this.deleteEvent,
+    this._exList,
+  );
   @override
   _TrackingScreenState createState() => _TrackingScreenState();
 }
@@ -26,6 +34,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
               .where((test) => test.exercise == _selectedEx)
               .toList();
           _selectedEvents.sort((a, b) => b.date.compareTo(a.date));
+        });
+      } else if (!widget._exList.contains(_selectedEx)) {
+        setState(() {
+          _selectedEx = null;
         });
       }
     });

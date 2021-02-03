@@ -18,17 +18,29 @@ class _TabScreenState extends State<TabScreen> {
   List<Widget> _pages;
   List<String> _exList = [];
 
-  Map<String, bool> _filters = {};
+  Map<String, bool> _filters = {'undefined': true};
   List<Event> _events = [];
+
+  // DateTime selectedDay = DateTime.now();
+  // String _selectedEx;
 
   // initState
   @override
   void initState() {
     _pages = [
-      HomeScreen(routeManageScreen, _events),
+      HomeScreen(
+        routeManageScreen,
+        _events,
+        switchToCalendarScreen,
+      ),
       CalendarScreen(
-          _events, _filters, routeAddEventScreen, _exList, deleteEvent),
-      TrackingScreen(_events, routeChooseExScreen, deleteEvent),
+        _events,
+        _filters,
+        routeAddEventScreen,
+        _exList,
+        deleteEvent,
+      ),
+      TrackingScreen(_events, routeChooseExScreen, deleteEvent, _exList),
     ];
     super.initState();
   }
@@ -37,6 +49,13 @@ class _TabScreenState extends State<TabScreen> {
   void _onTap(idx) {
     setState(() {
       _curIdx = idx;
+    });
+  }
+
+  // tap 오늘의 운동 목록관리
+  void switchToCalendarScreen() {
+    setState(() {
+      _curIdx = 1;
     });
   }
 
@@ -59,9 +78,14 @@ class _TabScreenState extends State<TabScreen> {
   }
 
   // 운동event 추가 화면 route 및 event 추가
-  Future routeAddEventScreen(DateTime date) {
+  Future routeAddEventScreen({DateTime date, Event oldEvent}) {
     return Navigator.of(context).push(MaterialPageRoute(
-        builder: (ctx) => AddEventScreen(routeChooseExScreen, date, _exList)));
+        builder: (ctx) => AddEventScreen(
+              routeChooseExScreen,
+              _exList,
+              date: date,
+              oldEvent: oldEvent,
+            )));
   }
 
   // event 삭제
@@ -91,7 +115,6 @@ class _TabScreenState extends State<TabScreen> {
   @override
   Widget build(BuildContext context) {
     print('build tapScreen!');
-    print(_exList.length);
     return Scaffold(
       appBar: AppBar(
         title: Text('work out tracker'),

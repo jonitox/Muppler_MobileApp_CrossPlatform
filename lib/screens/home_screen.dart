@@ -7,7 +7,9 @@ import '../widgets/event_list.dart';
 class HomeScreen extends StatelessWidget {
   final Function _routeManageScreen;
   final List<Event> _events;
-  HomeScreen(this._routeManageScreen, this._events);
+  final Function switchToCalendarScreen;
+  HomeScreen(
+      this._routeManageScreen, this._events, this.switchToCalendarScreen);
 
   Widget _buildEventTile(BuildContext ctx, Event event) {
     return Card(
@@ -68,14 +70,16 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  // isSameDay
   bool _isSameDay(DateTime day1, DateTime day2) {
     return day1.year == day2.year &&
         day1.month == day2.month &&
         day1.day == day2.day;
   }
 
-  void _tapTodayEvents() {
-    //
+  // tap Manage Today's Events
+  void _tapManageTodayEvents() {
+    switchToCalendarScreen();
   }
 
   @override
@@ -91,8 +95,8 @@ class HomeScreen extends StatelessWidget {
           children: [
             Text('오늘의 운동'),
             RaisedButton(
-              onPressed: (null),
-              child: Text('오늘의 계획 관리하러가기'),
+              onPressed: _tapManageTodayEvents,
+              child: Text('오늘의 운동 계획 관리하러가기'),
             ),
           ],
         ),
