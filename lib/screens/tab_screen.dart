@@ -82,7 +82,6 @@ class _TabScreenState extends State<TabScreen> {
     return Navigator.of(context).push(MaterialPageRoute(
         builder: (ctx) => AddEventScreen(
               routeChooseExScreen,
-              _exList,
               date: date,
               oldEvent: oldEvent,
             )));
@@ -124,18 +123,15 @@ class _TabScreenState extends State<TabScreen> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            title: Text('홈'),
-            // label: '홈',
+            label: '홈',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
-            title: Text('달력'),
-            // label: '달력',
+            label: '달력',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.fitness_center),
-            title: Text('종목'),
-            // label: '종목',
+            label: '종목',
           ),
         ],
         currentIndex: _curIdx,

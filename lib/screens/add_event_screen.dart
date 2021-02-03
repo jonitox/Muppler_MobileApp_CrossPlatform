@@ -8,11 +8,10 @@ class AddEventScreen extends StatefulWidget {
   static const routeName = '/add_event_screen';
   final Function _routeChooseExScreen;
   final DateTime date;
-  final List<String> _exList;
+
   final Event oldEvent;
   AddEventScreen(
-    this._routeChooseExScreen,
-    this._exList, {
+    this._routeChooseExScreen, {
     this.date,
     this.oldEvent,
   });
@@ -25,7 +24,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
   Event _newEvent;
   final _weightController = TextEditingController();
   final _repController = TextEditingController();
-
+  final _exNameController = TextEditingController();
   // initialize
   @override
   initState() {
@@ -57,6 +56,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
   // add a set to current Event
   void _addSet() {
+    // more: 입력이 valid한지(double,int) 확인하는 logic추가
     setState(() {
       _newEvent.addSet(Set(
         double.parse(_weightController.text),
@@ -65,31 +65,215 @@ class _AddEventScreenState extends State<AddEventScreen> {
     });
   }
 
-  // tap Choose Exercise Button
+  // remove a set from current Event
+  void _removeSet() {
+    setState(() {
+      _newEvent.removeSet();
+    });
+  }
+
+  // tap enter exercise button // more: subtract widget (다시 켰을떄 없게끔.)
+  void _tapEnterEx() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('운동 이름'),
+        content: TextField(
+          controller: _exNameController,
+          // onChanged: ,
+        ),
+        actions: [
+          FlatButton(
+            child: Text('취소'),
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          FlatButton(
+            child: Text('저장'),
+            onPressed: () => Navigator.of(ctx).pop(_exNameController.text),
+          ),
+        ],
+      ),
+      barrierDismissible: true,
+    ).then((ret) {
+      if (ret != null) {
+        setState(() {
+          _selectedEx = ret as String;
+        });
+      }
+    });
+  }
+
+  // tap Choose my Exercise Button
   void _tapChooseEx() {
     widget._routeChooseExScreen(_selectedEx).then((ret) {
       if (ret != null && ret != _selectedEx) {
         setState(() {
           _selectedEx = ret;
         });
-      } else if (!widget._exList.contains(_selectedEx)) {
-        setState(() {
-          _selectedEx = null;
-        });
       }
     });
   }
 
-  // build sets of Event
+  // tap Weight
+  void _tapWeight(int idx) {
+    final _formKey = GlobalKey<FormState>();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("무게"),
+        content: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TextFormField(
+                validator: (value) {
+                  if (double.tryParse(value) == null ||
+                      double.parse(value) < 0) {
+                    return 'unvalid input';
+                  }
+                  return null;
+                },
+                onSaved: (newWeight) => setState(() {
+                  _newEvent.sets[idx].weight = double.parse(newWeight);
+                }),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Validate will return true if the form is valid, or false if
+                    // the form is invalid.
+                    if (_formKey.currentState.validate()) {
+                      _formKey.currentState.save();
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Text('저장'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('취소'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+  // tap Rep
+  void _tapRep(int idx) {
+    final _formKey = GlobalKey<FormState>();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("횟수"),
+        content: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TextFormField(
+                validator: (value) {
+                  if (int.tryParse(value) == null || int.parse(value) < 0) {
+                    return 'unvalid input';
+                  }
+                  return null;
+                },
+                onSaved: (newRep) => setState(() {
+                  _newEvent.sets[idx].rep = int.parse(newRep);
+                }),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Validate will return true if the form is valid, or false if
+                    // the form is invalid.
+                    if (_formKey.currentState.validate()) {
+                      _formKey.currentState.save();
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Text('저장'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('취소'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+// // form없이 action으로 구현한 tap Rep // validation미포함
+//   void _tapRep(int idx) {
+//     String newValue;
+//     showDialog(
+//       context: context,
+//       builder: (ctx) => AlertDialog(
+//         content: Row(
+//           children: [
+//             Container(
+//               width: 100, //?? size
+//               child: TextField(
+//                 keyboardType: TextInputType.number,
+//                 onChanged: (val) => newValue = val,
+//               ),
+//             ),
+//             Text('회'),
+//           ],
+//         ),
+//         actions: [
+//           FlatButton(
+//             child: Text('취소'),
+//             onPressed: () => Navigator.of(ctx).pop(),
+//           ),
+//           FlatButton(
+//             child: Text('저장'),
+//             onPressed: () => Navigator.of(ctx).pop(newValue),
+//           ),
+//         ],
+//       ),
+//       barrierDismissible: true,
+//     ).then((ret) {
+//       if (ret != null) {
+//         setState(() {
+//           _newEvent.sets[idx].rep = int.parse(ret);
+//         });
+//       }
+//     });
+//   }
+  // build set Tile of Event
   List<Widget> get _buildSetList {
-    int idx = 0;
-    return _newEvent.sets.map((item) {
+    return _newEvent.sets.asMap().entries.map((entry) {
+      final idx = entry.key;
+      final item = entry.value;
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text('${++idx}세트'),
-          Text('${item.weight}Kg'),
-          Text('${item.rep}회'),
+          Text('${idx + 1}세트'),
+          FlatButton(
+            child: Text('${item.weight}Kg'),
+            onPressed: () => _tapWeight(idx),
+          ),
+          FlatButton(
+            child: Text('${item.rep}회'),
+            onPressed: () => _tapRep(idx),
+          ),
         ],
       );
     }).toList();
@@ -115,14 +299,15 @@ class _AddEventScreenState extends State<AddEventScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text('종목:'),
-              _selectedEx != null ? Text(_selectedEx) : Text('unselected!'),
-              IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: null,
+              RaisedButton(
+                child: _selectedEx != null
+                    ? Text(_selectedEx)
+                    : Text('운동 이름을 입력하세요'),
+                onPressed: _tapEnterEx,
               ),
               RaisedButton(
                 onPressed: _tapChooseEx,
-                child: Text('선택'),
+                child: Text('내가 하는 운동에서 선택'),
               )
             ],
           ),
@@ -148,6 +333,11 @@ class _AddEventScreenState extends State<AddEventScreen> {
                       ),
                     ),
                     Text('회'),
+                    if (_newEvent.numOfSets > 0)
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: _removeSet,
+                      ),
                     IconButton(
                       icon: Icon(Icons.add),
                       onPressed: _addSet,

@@ -11,48 +11,48 @@ class HomeScreen extends StatelessWidget {
   HomeScreen(
       this._routeManageScreen, this._events, this.switchToCalendarScreen);
 
-  Widget _buildEventTile(BuildContext ctx, Event event) {
-    return Card(
-      elevation: 4,
-      color: Colors.red[50],
-      child: Container(
-        // height: 20,
-        // width: 100,
-        decoration: BoxDecoration(
-          // color: Colors.blue,
-          border: Border(),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        padding: const EdgeInsets.all(3),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Text(event.exercise),
-                Icon(Icons.edit),
-                Icon(Icons.delete),
-              ],
-            ),
-            ...(event.sets)
-                .asMap()
-                .entries
-                .map(
-                  (entry) => Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text('${entry.key + 1} 세트'),
-                      Text('${entry.value.weight} Kg'),
-                      Text('${entry.value.rep} 회'),
-                    ],
-                  ),
-                )
-                .toList(),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildEventTile(BuildContext ctx, Event event) {
+  //   return Card(
+  //     elevation: 4,
+  //     color: Colors.red[50],
+  //     child: Container(
+  //       // height: 20,
+  //       // width: 100,
+  //       decoration: BoxDecoration(
+  //         // color: Colors.blue,
+  //         border: Border(),
+  //         borderRadius: BorderRadius.circular(10),
+  //       ),
+  //       padding: const EdgeInsets.all(3),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Row(
+  //             children: [
+  //               Text(event.exercise),
+  //               Icon(Icons.edit),
+  //               Icon(Icons.delete),
+  //             ],
+  //           ),
+  //           ...(event.sets)
+  //               .asMap()
+  //               .entries
+  //               .map(
+  //                 (entry) => Row(
+  //                   // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //                   children: [
+  //                     Text('${entry.key + 1} 세트'),
+  //                     Text('${entry.value.weight} Kg'),
+  //                     Text('${entry.value.rep} 회'),
+  //                   ],
+  //                 ),
+  //               )
+  //               .toList(),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildTodayEvents(BuildContext ctx, List _todayEvents) {
     return Container(

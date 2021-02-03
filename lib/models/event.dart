@@ -15,22 +15,29 @@ class Event {
   }) {
     if (sets == null) sets = <Set>[];
   }
+  int get numOfSets {
+    return sets.length;
+  }
 
   void addSet(Set item) {
     sets.add(item);
   }
 
-  void removeSet(int idx) {
-    // ..
+  void removeSet() {
+    if (numOfSets > 0) sets.removeLast();
   }
 }
 
 class Set {
-  final int rep;
-  final double weight;
-  Set(this.weight, this.rep);
+  int _rep;
+  double _weight;
+  Set(this._weight, this._rep);
 
-  double get volume {
-    return rep * weight;
-  }
+  double get weight => _weight;
+  int get rep => _rep;
+
+  set weight(double newWeight) => _weight = newWeight;
+  set rep(int newRep) => _rep = newRep;
+
+  double get volume => _rep * _weight;
 }
