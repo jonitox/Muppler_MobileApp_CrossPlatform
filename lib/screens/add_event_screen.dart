@@ -9,7 +9,13 @@ class AddEventScreen extends StatefulWidget {
   final Function _routeChooseExScreen;
   final DateTime date;
   final List<String> _exList;
-  AddEventScreen(this._routeChooseExScreen, this.date, this._exList);
+  final Event oldEvent;
+  AddEventScreen(
+    this._routeChooseExScreen,
+    this._exList, {
+    this.date,
+    this.oldEvent,
+  });
   @override
   _AddEventScreenState createState() => _AddEventScreenState();
 }
@@ -24,18 +30,21 @@ class _AddEventScreenState extends State<AddEventScreen> {
   @override
   initState() {
     // final date = ModalRoute.of(context).settings.arguments as DateTime;
-    _newEvent = Event(
-      date: widget.date,
-      id: DateTime.now().toString(),
-    );
+    if (widget.oldEvent == null) {
+      _newEvent = Event(
+        date: widget.date,
+        id: DateTime.now().toString(),
+      );
+    } else {
+      _newEvent = widget.oldEvent;
+      _selectedEx = _newEvent.exercise;
+    }
     super.initState();
   }
 
   // save Event // more: pop-up alert
   void _saveEvent() {
-    if (_newEvent.sets.length == 0) {
-      print('NO EVENT DESCRIBE!');
-    } else if (_selectedEx == null) {
+    if (_selectedEx == null) {
       print('SELECTE EXERCISE!');
     } else {
       _newEvent.exercise = _selectedEx;
@@ -91,7 +100,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
     print('build AddEventScreen!');
     return Scaffold(
       appBar: AppBar(
-          title: Text('${DateFormat.Md().format(widget.date)}의 운동기록'),
+          title: Text('${DateFormat.Md().format(_newEvent.date)}의 운동기록'),
           actions: [
             IconButton(
               icon: Icon(Icons.save),
@@ -109,8 +118,12 @@ class _AddEventScreenState extends State<AddEventScreen> {
               _selectedEx != null ? Text(_selectedEx) : Text('unselected!'),
               IconButton(
                 icon: Icon(Icons.edit),
-                onPressed: _tapChooseEx,
+                onPressed: null,
               ),
+              RaisedButton(
+                onPressed: _tapChooseEx,
+                child: Text('선택'),
+              )
             ],
           ),
           Expanded(
