@@ -5,7 +5,7 @@ A new Flutter project.
 
 
 # To do    
-- 디자인 변경 및 theme 추가   
+- 디자인 변경 및 theme 추가(dev tool로 layout확인하며 개발.)    
 - 애니메이션 추가  (event Tile(축소/확대),)    
 - 폰트 추가      
 - db 관리   
@@ -31,3 +31,6 @@ A new Flutter project.
 - eventList에 divider
 - 필터에 스위치말고 체크표시. Icon.check_box(outlined)
 - 생성자로 passing하는 변수명 같게 유지하지말고 조금씩 다르게.
+- id를 now()말고 다르게 지정. (now는 디버그시에만 간편사용? 강의볼것.)
+- 무게에 toStringAsFixed 사용.
+- 운동 추가, 삭제 등을 생성자로 받은 List에 직접하지말고 상위레벨에서 함수(add,delete)전달받아서 실행.   
