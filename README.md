@@ -34,3 +34,4 @@ A new Flutter project.
 - id를 now()말고 다르게 지정. (now는 디버그시에만 간편사용? 강의볼것.)
 - 무게에 toStringAsFixed 사용.
 - 운동 추가, 삭제 등을 생성자로 받은 List에 직접하지말고 상위레벨에서 함수(add,delete)전달받아서 실행.   
+- listview children -> builder(운동종목숫자 모를시.)    
