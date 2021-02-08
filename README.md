@@ -5,6 +5,7 @@ A new Flutter project.
 
 
 # To do    
+- provider 적용(stateful유지할곳(local state)은 유지.)     
 - 디자인 변경 및 theme 추가(dev tool로 layout확인하며 개발.)    
 - 애니메이션 추가  (event Tile(축소/확대),)    
 - 폰트 추가      
@@ -35,4 +36,7 @@ A new Flutter project.
 - 무게에 toStringAsFixed 사용.
 - 운동 추가, 삭제 등을 생성자로 받은 List에 직접하지말고 상위레벨에서 함수(add,delete)전달받아서 실행.   
 - listview children -> builder(운동종목숫자 모를시.)    
-- map의 key가 없을때 추가시 -> putIfAbsent / value update 시 -> update
+- map의 key가 없을때 추가시 -> putIfAbsent / value update 시 -> update     
+- map의 forEach가능. (toEntries 필요x)     
+- Badge같은 custom widget사용 가능한곳있는지 확인.    
+- 디자인 등은 많은 다른 코드 및 예제앱 코드 참조. (card를 container로 감싸는지, container를 card로 감싸는지, padding,margin 처리 등)    
