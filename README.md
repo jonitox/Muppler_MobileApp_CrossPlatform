@@ -40,3 +40,4 @@ A new Flutter project.
 - map의 forEach가능. (toEntries 필요x)     
 - Badge같은 custom widget사용 가능한곳있는지 확인.    
 - 디자인 등은 많은 다른 코드 및 예제앱 코드 참조. (card를 container로 감싸는지, container를 card로 감싸는지, padding,margin 처리 등)    
+- event tile의 set column을 listview로하고 listview의 container의 height을 min(갯수*20+10, 100)으로 설정. 일정크기넘어가면 scroll하게.    
