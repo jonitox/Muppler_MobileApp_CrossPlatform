@@ -43,7 +43,7 @@ A new Flutter project.
 - event tile의 set column을 listview로하고 listview의 container의 height을 min(갯수*20+10, 100)으로 설정. 일정크기넘어가면 scroll하게.    
 - context, ctx 혼용되있는곳 다시 전부 확인, 구분해서 사용.
 - Form 개선. TextInputActioin.next /     
-- TextEditingController dispose    
+- TextEditingController dispose 추가       
 - FocusNode 사용가능하면 추가    
 
 - Form 개선. TextInputActioin.next / 
