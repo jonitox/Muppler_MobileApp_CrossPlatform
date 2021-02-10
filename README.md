@@ -45,5 +45,4 @@ A new Flutter project.
 - Form 개선. TextInputActioin.next /     
 - TextEditingController dispose 추가       
 - FocusNode 사용가능하면 추가    
-
-- Form 개선. TextInputActioin.next / 
+- Form 개선. TextInputActioin.next / validator 수정.(value.isEmpty, can parse double etc)     
