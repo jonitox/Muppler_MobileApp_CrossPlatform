@@ -41,7 +41,7 @@ A new Flutter project.
 - Badge같은 custom widget사용 가능한곳있는지 확인.    
 - 디자인 등은 많은 다른 코드 및 예제앱 코드 참조. (card를 container로 감싸는지, container를 card로 감싸는지, padding,margin 처리 등)    
 - event tile의 set column을 listview로하고 listview의 container의 height을 min(갯수*20+10, 100)으로 설정. 일정크기넘어가면 scroll하게.    
-- context, ctx 혼용되있는곳 다시 전부 확인, 구분해서 사용.
+- context, ctx 혼용되있는곳(Navigator.of(ctx).pop 같이) 다시 전부 확인, 구분해서 사용. 현위젯의 context(builder라면 builder에 전달된 context를 사용)
 - Form 개선. TextInputActioin.next /     
 - TextEditingController dispose 추가       
 - FocusNode 사용가능하면 추가    
