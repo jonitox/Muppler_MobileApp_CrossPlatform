@@ -22,6 +22,8 @@ A new Flutter project.
 - 각종 device에 test(keyboard 렌더링될 때, Text(kg,횟수 등) 범위가 초과할때(:overflow 추가) 등등 layout확인)
 - 달성률 저장 기능
 - 루틴 관리 기능
+- 메모 기능    
+- 카운터 기능, 타이머 기능
 ---------------------------------
 - addEvent textfield form으로
 - test,image등 fittedBox로 wrap하여 사용(혹은 overflow지정?)
