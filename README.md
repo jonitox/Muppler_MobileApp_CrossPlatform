@@ -23,7 +23,8 @@ A new Flutter project.
 - 달성률 저장 기능
 - 루틴 관리 기능
 - 메모 기능    
-- 카운터 기능, 타이머 기능
+- 카운터 기능, 타이머 기능   
+- 아이폰 고려. safeArea.    
 ---------------------------------
 - addEvent textfield form으로
 - test,image등 fittedBox로 wrap하여 사용(혹은 overflow지정?)
