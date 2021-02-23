@@ -49,3 +49,4 @@ A new Flutter project.
 - FocusNode 사용가능하면 추가    
 - Form 개선. TextInputActioin.next / validator 수정.(value.isEmpty, can parse double etc)     
 - future, then -> async, await으로 수정. error는 try&catch,throw으로 관리.      
+- hero 사용가능하면 추가    
