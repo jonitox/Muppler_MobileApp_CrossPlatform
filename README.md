@@ -51,3 +51,4 @@ A new Flutter project.
 - Form 개선. TextInputActioin.next / validator 수정.(value.isEmpty, can parse double etc)     
 - future, then -> async, await으로 수정. error는 try&catch,throw으로 관리.      
 - hero 사용가능하면 추가    
+- 페이지 pop할때 받을 객체의 타입을 as말고 push<T>로 명시.
