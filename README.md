@@ -47,7 +47,7 @@ A new Flutter project.
 - context, ctx 혼용되있는곳(Navigator.of(ctx).pop 같이) 다시 전부 확인, 구분해서 사용. 현위젯의 context(builder라면 builder에 전달된 context를 사용)
 - Form 개선. TextInputActioin.next /     
 - TextEditingController dispose 추가       
-- FocusNode 사용가능하면 추가    
+- FocusNode 사용가능하면 추가, unFocus()도   
 - Form 개선. TextInputActioin.next / validator 수정.(value.isEmpty, can parse double etc)     
 - future, then -> async, await으로 수정. error는 try&catch,throw으로 관리.      
 - hero 사용가능하면 추가    
