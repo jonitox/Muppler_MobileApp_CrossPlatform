@@ -54,3 +54,4 @@ A new Flutter project.
 - 페이지 pop할때 받을 객체의 타입을 as말고 push<T>로 명시. 
 - Function 생성자로 전달시, 받는 클래스 내에서 함수 형태를 규정.      
 - input에 trim()추가.    
+- pageTransition/ customRoute
