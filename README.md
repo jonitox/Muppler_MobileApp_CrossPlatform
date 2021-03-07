@@ -57,3 +57,5 @@ A new Flutter project.
 - pageTransition/ customRoute
 - LayoutBuilder    
 - dismissable
+- 공유 기능
+- dismissable
