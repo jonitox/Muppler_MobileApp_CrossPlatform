@@ -56,4 +56,5 @@ A new Flutter project.
 - LayoutBuilder    
 - dismissable
 - 공유 기능
-- dismissable
+- dismissable    
+- 메모리 leak안생기는지 확인.   
