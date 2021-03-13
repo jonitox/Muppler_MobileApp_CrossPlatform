@@ -6,6 +6,7 @@ A new Flutter project.
 
 # To do    
 - provider 적용(stateful유지할곳(local state)은 유지.)     
+- stateful 불필요한곳 지우기   
 - 디자인 변경 및 theme 추가(dev tool로 layout확인하며 개발.)    
 - 애니메이션 추가  (event Tile(축소/확대),) (성능 고려. 너무 많이말고 필요한 곳만.)   
 - 폰트 추가      
