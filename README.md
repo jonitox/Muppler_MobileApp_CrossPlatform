@@ -11,9 +11,9 @@ A new Flutter project.
 - 애니메이션 추가  (event Tile(축소/확대),) (성능 고려. 너무 많이말고 필요한 곳만.)   
 - 폰트 추가      
 - 달력에 종목별 표기 버튼 및 달력rendering.   
-- 로딩페이지 구현.(로고 애니메이션 / 스크린 이동버튼)    
-- Android/Ios 분리    
-- 지원 모드 지정.    
+- 로딩페이지 구현.(로고 애니메이션 / 스크린 이동버튼 )    
+- Android/Ios 분리     
+- 지원 모드 지정.     
 - tab화면 이동시 기존변수들 유지. (provider 적용 후)
 - performance 최적화(build함수내 print활용하여별 동작별 위젯의 빌드여부 확인. / const위젯)
 - 운동 볼륨 표시
