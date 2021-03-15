@@ -25,7 +25,7 @@ A new Flutter project.
 - 카운터 기능, 타이머 기능   
 - 아이폰 고려. safeArea.    
 ---------------------------------
-- addEvent textfield form으로
+- addEvent textfield form으로.    
 - test,image등 fittedBox로 wrap하여 사용(혹은 overflow지정?)
 - switch.adaptive적용
 - onUnknownRoute추가
