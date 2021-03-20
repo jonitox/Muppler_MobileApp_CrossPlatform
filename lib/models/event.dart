@@ -1,43 +1,103 @@
 import 'package:flutter/foundation.dart';
 
-class Event {
-  String exercise;
-  DateTime date;
-  String id;
-  // example Sets
-  List<Set> sets;
+enum DetailType {
+  basic,
+  onlyRep,
+}
 
+class Event {
+  final String id;
+  final DateTime date;
+  String exerciseId;
+  List<Set> setDetails;
+  String memo;
+  DetailType type;
   Event({
-    this.date,
     @required this.id,
-    this.exercise,
-    this.sets,
+    this.date,
+    @required this.exerciseId,
+    this.setDetails,
+    this.memo = '',
+    this.type = DetailType.basic,
   }) {
-    if (sets == null) sets = <Set>[];
+    if (setDetails == null) {
+      setDetails = <Set>[]; // 그냥 클래스내에서 []를 명시?
+    }
   }
+
   int get numOfSets {
-    return sets.length;
+    return setDetails.length;
+  }
+
+  Event copyWith({
+    String id,
+    DateTime date,
+    String exerciseId,
+    List<Set> setDetails,
+    String memo,
+    DetailType type,
+  }) {
+    return Event(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      exerciseId: exerciseId ?? this.exerciseId,
+      setDetails: setDetails ?? List.from(this.setDetails),
+      memo: memo ?? this.memo,
+      type: type ?? this.type,
+    );
   }
 
   void addSet(Set item) {
-    sets.add(item);
+    setDetails.add(item);
   }
 
   void removeSet() {
-    if (numOfSets > 0) sets.removeLast();
+    if (numOfSets > 0) setDetails.removeLast();
+  }
+
+  dynamic get volume {
+    if (type == DetailType.basic) {
+      return setDetails.fold(0.0, (sum, element) => sum += element.volume);
+    } else {
+      return setDetails.fold(0, (sum, element) => sum += element.rep);
+    }
+  }
+
+  Map<String, dynamic> eventToMap() {
+    print('call eventToMap!');
+    print(id);
+    // dynamic?
+    // id TEXT PRIMARY KEY, exerciseId TEXT, memo TEXT, date TEXT, type INTEGER
+    return {
+      'id': id,
+      'exerciseId': exerciseId,
+      'memo': memo,
+      'date': date.toIso8601String(),
+      'type': type.index,
+    };
+  }
+
+  List<Map<String, dynamic>> setsToList() {
+    print('call setsToList!');
+    print(id);
+    // id INTEGER PRIMARY KEY, eventId TEXT, setNumber INTEGER, weight REAL, repetition INTEGER
+    return setDetails.asMap().entries.map((entry) {
+      final i = entry.key;
+      final s = entry.value;
+      return {
+        'eventId': id,
+        'setNumber': i,
+        'weight': s.weight,
+        'repetition': s.rep,
+      };
+    }).toList();
   }
 }
 
 class Set {
-  int _rep;
-  double _weight;
-  Set(this._weight, this._rep);
+  int rep;
+  double weight;
+  Set(this.weight, this.rep);
 
-  double get weight => _weight;
-  int get rep => _rep;
-
-  set weight(double newWeight) => _weight = newWeight;
-  set rep(int newRep) => _rep = newRep;
-
-  double get volume => _rep * _weight;
+  double get volume => rep * weight;
 }

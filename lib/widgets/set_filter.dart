@@ -53,6 +53,7 @@ class _SetFilterState extends State<SetFilter> {
               width: double.maxFinite,
               child: ListView.builder(
                 itemCount: _newFilters.length,
+                // 코드가독성 증가: ListTile 빌더로뺴기.
                 itemBuilder: (ctx, idx) => SwitchListTile(
                   title: Text(idx < widget._exList.length
                       ? widget._exList[idx]

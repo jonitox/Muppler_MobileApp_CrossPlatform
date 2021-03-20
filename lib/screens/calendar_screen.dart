@@ -1,160 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:work_out_tracker/widgets/filters_dialog.dart';
 
-import '../models/event.dart';
-import '../widgets/event_list.dart';
-import '../widgets/set_filter.dart';
+import '../providers/calendar_state.dart';
+
+import './pick_exercise_screen.dart';
+
+import '../widgets/daily_title.dart';
+import '../widgets/display_events.dart';
+import '../widgets/calendar.dart';
 
 class CalendarScreen extends StatefulWidget {
-  final Function _routeAddEventScreen;
-  final List<Event> _events;
-  final Map<String, bool> _filters;
-  final List<String> _exLists;
-  final Function deleteEvent;
-
-  // final DateTime selectedDay;
-  // final Function switchSelectedDay;
-  CalendarScreen(
-    // this.selectedDay,
-    this._events,
-    this._filters,
-    this._routeAddEventScreen,
-    this._exLists,
-    this.deleteEvent,
-  );
-  // this.switchSelectedDay);
-
   @override
   _CalendarScreenState createState() => _CalendarScreenState();
 }
 
 // ****************** Clendar Screen ***************** // TickerProvider?
-class _CalendarScreenState extends State<CalendarScreen>
-    with TickerProviderStateMixin {
-  List _selectedEvents;
+class _CalendarScreenState extends State<CalendarScreen> {
+  // with TickerProviderStateMixin {
   CalendarController _calendarController;
-  AnimationController _animationController;
-  Map<DateTime, List> _filteredEvents = {};
+  Size deviceSize;
+  // AnimationController _animationController;
+
   // // Example holidays
   // final Map<DateTime, List> _holidays = {
   //   DateTime(2021, 1, 1): ['New Year\'s Day'],
   // };
 
-  // filtering Events
-  void _filteringEvents() {
-    _filteredEvents.clear();
-    widget._events.forEach((test) {
-      if ((widget._filters.containsKey(test.exercise) &&
-              widget._filters[test.exercise] == true) ||
-          !widget._filters.containsKey(test.exercise) &&
-              widget._filters['undefined'] == true) {
-        if (_filteredEvents[test.date] == null) {
-          _filteredEvents[test.date] = [];
-        }
-        _filteredEvents[test.date].add(test);
-      }
-    });
+  void _switchCalendarFormat() {
+    Provider.of<CalendarState>(context, listen: false).toggleFormat();
+    _calendarController.toggleCalendarFormat();
   }
 
-  // tap set Filter button
-  void _tapSetFilter() {
-    showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (bctx) => SetFilter(widget._filters, widget._exLists),
-    ).then((ret) {
-      if (ret != null) {
-        setState(() {
-          final List<bool> newFilters = ret;
-          widget._filters['undefined'] = newFilters.removeLast();
-          newFilters.asMap().entries.forEach((entry) {
-            final ex = widget._exLists[entry.key];
-            widget._filters[ex] = entry.value;
-          });
-          _filteringEvents();
-          _selectedEvents =
-              _filteredEvents[_calendarController.selectedDay] ?? [];
-        });
-      }
-    });
-  }
-
-  // tap add Event button
-  void _tapAddEvent() {
-    widget
-        ._routeAddEventScreen(date: _calendarController.selectedDay)
-        .then((ret) {
-      if (ret != null) {
-        setState(() {
-          widget._events.add(ret as Event);
-          _filteringEvents();
-          _selectedEvents =
-              _filteredEvents[_calendarController.selectedDay] ?? [];
-        });
-      }
-    });
-  }
-
-  // delete event
-  void _deleteEvent(String id) {
-    setState(() {
-      widget.deleteEvent(id);
-      _filteringEvents();
-      _selectedEvents = _filteredEvents[_calendarController.selectedDay] ?? [];
-    });
-  }
-
-  // edit event
-  void _editEvent(Event old) {
-    widget._routeAddEventScreen(oldEvent: old).then((ret) {
-      if (ret != null) {
-        setState(() {
-          widget._events.removeWhere((test) => test.id == old.id);
-          widget._events.add(ret as Event);
-          _filteringEvents();
-          _selectedEvents =
-              _filteredEvents[_calendarController.selectedDay] ?? [];
-        });
-      }
-    });
-  }
-
-  //  onDaySelected
-  void _onDaySelected(DateTime day, List events, List holidays) {
-    setState(() {
-      _selectedEvents = events;
-      // _selectedDay = _calendarController.selectedDay;
-      // widget.switchSelectedDay(_selectedDay);
-      print('set selectedDay!');
-    });
-  }
-
-  // onCalendarCreated
-  void _onCalendarCreated(_, __, ___) {
-    // _selectedEvents = widget._events[_calendarController.selectedDay] ?? [];
+  // ************ tap filtering setting************ //
+  void _setFilter() async {
+    await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (bctx) => FiltersDialog());
   }
 
   // initState
   @override
   void initState() {
-    print('init CalendarState!');
-    _filteringEvents();
-    final _selectedDay = DateTime.now();
-    final _dayKey = _filteredEvents.keys.firstWhere(
-        (test) =>
-            test.year == _selectedDay.year &&
-            test.month == _selectedDay.month &&
-            test.day == _selectedDay.day,
-        orElse: () => null);
-    _selectedEvents = _dayKey != null ? _filteredEvents[_dayKey] : [];
-
+    print('init Calendar Screen!');
     _calendarController = CalendarController();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _animationController.forward();
+    // _calendarController.setCalendarFormat(CalendarFormat.month);
+    // _animationController = AnimationController(
+    //   vsync: this,
+    //   duration: const Duration(milliseconds: 400),
+    // );
+    // _animationController.forward();
 
     super.initState();
   }
@@ -162,178 +59,94 @@ class _CalendarScreenState extends State<CalendarScreen>
   // dispose
   @override
   void dispose() {
-    _animationController.dispose();
+    print('dispose Calendar Screen!');
+    // _animationController.dispose();
     _calendarController.dispose();
     super.dispose();
+  }
+
+  // ************ calendar settings row ************ //
+  Widget get calendarSettingsRow {
+    final deviceSize = MediaQuery.of(context).size;
+    final themeData = Theme.of(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+        GestureDetector(
+          onTap: _setFilter,
+          child: Column(
+            children: [
+              Icon(
+                Icons.push_pin_outlined,
+                color: Colors.black,
+              ),
+              Text('필터링'),
+            ],
+          ),
+        ),
+        Consumer<CalendarState>(
+          builder: (ctx, currentState, _) => GestureDetector(
+            onTap: _switchCalendarFormat,
+            child: Column(
+              children: [
+                Icon(Icons.remove_red_eye_outlined),
+                currentState.format == CalendarFormat.month
+                    ? Text('한 주 보기')
+                    : Text('한 달 보기'),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ************ add event  button ************ //
+  Widget get addEventButton {
+    final deviceSize = MediaQuery.of(context).size;
+    final themeData = Theme.of(context);
+    return OutlinedButton(
+      style: ButtonStyle(
+        minimumSize: MaterialStateProperty.resolveWith<Size>(
+            (_) => Size(deviceSize.width * 0.5, 40)),
+        side: MaterialStateProperty.resolveWith<BorderSide>(
+          (_) => BorderSide(color: themeData.accentColor, width: 0.8),
+        ),
+      ),
+      child: Text(
+        '운동 추가하기',
+        style: TextStyle(
+          fontSize: 18,
+          color: themeData.accentColor,
+        ),
+      ),
+      onPressed: () =>
+          Navigator.of(context).pushNamed(PickExerciseScreen.routeName),
+    );
   }
 
   // *************** build Calendar Screen ***************** //
   @override
   Widget build(BuildContext context) {
-    print('build calendarScreen!');
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        _buildCalendar(),
-        const SizedBox(height: 8.0),
-        _buildButtons(),
-        const SizedBox(height: 8.0),
-        Text(DateFormat.Md()
-                .format(_calendarController.selectedDay ?? DateTime.now())
-                .toString() +
-            '의 운동 계획'), // more: tab의 _selectDay 값으로 변경.
-        _selectedEvents.length > 0
-            ? Expanded(
-                child: EventList(
-                  selectedEvents: _selectedEvents,
-                  deleteEvent: _deleteEvent,
-                  editEvent: _editEvent,
-                  isEditVisible: true,
-                ),
-              )
-            : Text('오늘 계획된 운동이 없습니다!'),
-      ],
-    );
-  }
-
-  // ************* build Calendar **************** //
-  Widget _buildCalendar() {
-    return TableCalendar(
-      locale: 'ko_KR',
-      calendarController: _calendarController,
-      events: _filteredEvents,
-      // initialSelectedDay: _selectedDay,
-      // holidays: _holidays,
-      initialCalendarFormat: CalendarFormat.month,
-      formatAnimation: FormatAnimation.slide,
-      startingDayOfWeek: StartingDayOfWeek.monday,
-      availableGestures: AvailableGestures.all,
-      availableCalendarFormats: const {
-        CalendarFormat.month: '',
-        CalendarFormat.week: '',
-      },
-
-      /// calendarStyle
-      calendarStyle: CalendarStyle(
-        outsideDaysVisible: true,
-        weekendStyle: TextStyle().copyWith(color: Colors.blue[800]),
-        holidayStyle: TextStyle().copyWith(color: Colors.blue[800]),
-      ),
-
-      ///  daysOfWeekStyle
-      daysOfWeekStyle: DaysOfWeekStyle(
-        weekendStyle: TextStyle().copyWith(color: Colors.blue[600]),
-      ),
-
-      /// headerStyle
-      headerStyle: HeaderStyle(
-        centerHeaderTitle: true,
-        formatButtonVisible: false,
-      ),
-
-      /// Builder
-      builders: CalendarBuilders(
-        // selectedDay
-        selectedDayBuilder: (context, date, _) {
-          return FadeTransition(
-            opacity: Tween(begin: 0.0, end: 1.0).animate(_animationController),
-            child: Container(
-              // decoration: BoxDecoration(border: Border.all(width: 1)),
-              margin: const EdgeInsets.all(4.0),
-              padding: const EdgeInsets.only(top: 5.0, left: 6.0),
-              color: Colors.amber[400],
-              width: 100,
-              height: 100,
-              child: Text(
-                '${date.day}',
-                style: TextStyle().copyWith(fontSize: 16.0),
-              ),
-            ),
-          );
-        },
-        // today
-        todayDayBuilder: (context, date, _) {
-          return Container(
-            margin: const EdgeInsets.all(4.0),
-            padding: const EdgeInsets.only(top: 5.0, left: 6.0),
-            color: Colors.red[300],
-            width: 100,
-            height: 100,
-            child: Text(
-              '${date.day}',
-              style: TextStyle().copyWith(fontSize: 16.0),
-            ),
-          );
-        },
-        // event & holiday marker
-        markersBuilder: (context, date, events, holidays) {
-          final children = <Widget>[];
-          if (events.isNotEmpty) {
-            children.add(
-              Positioned(
-                right: 1,
-                bottom: 1,
-                child: _buildEventsMarker(date, events),
-              ),
-            );
-          }
-          return children;
-        },
-      ),
-      onDaySelected: (date, events, holidays) {
-        _onDaySelected(date, events, holidays);
-        _animationController.forward(from: 0.0);
-      },
-      onCalendarCreated: _onCalendarCreated,
-      // onVisibleDaysChanged: _onVisibleDaysChanged,
-    );
-  }
-
-  // EventMarker
-  Widget _buildEventsMarker(DateTime date, List events) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: _calendarController.isSelected(date)
-            ? Colors.blue[500]
-            : _calendarController.isToday(date)
-                ? Colors.blue[300]
-                : Colors.blue[400],
-      ),
-      width: 16.0,
-      height: 16.0,
-      child: Center(
-        child: Text(
-          '${events.length}',
-          style: TextStyle().copyWith(
-            color: Colors.white,
-            fontSize: 12.0,
+    print('build Calendar Screen!');
+    return SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          Calendar(_calendarController),
+          calendarSettingsRow,
+          Divider(
+            height: 20,
+            thickness: 0.8,
+            color: Theme.of(context).primaryColor,
           ),
-        ),
+          DailyTitle(),
+          addEventButton,
+          Container(
+            padding: const EdgeInsets.all(10),
+            child: DisplayEvents(isDailyEvents: true),
+          ),
+        ],
       ),
-    );
-  }
-
-  // *************  build buttons below calendar  *************** //
-  Widget _buildButtons() {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-        // fillter Button
-        RaisedButton.icon(
-          icon: Icon(Icons.filter),
-          label: Text('필터'),
-          onPressed: _tapSetFilter,
-        ),
-        // add new Event BUtton
-        RaisedButton.icon(
-          icon: Icon(Icons.add),
-          label: Text('새로운 운동 추가하기'),
-          onPressed: _tapAddEvent,
-        ),
-      ],
     );
   }
 }

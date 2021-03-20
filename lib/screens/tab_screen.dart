@@ -1,141 +1,111 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import './add_event_screen.dart';
-import '../models/event.dart';
-import './calendar_screen.dart';
-import './tracking_screen.dart';
-import './home_screen.dart';
+import '../providers/events.dart';
+import '../providers/exercises.dart';
+import '../providers/routines.dart';
+import '../providers/filters.dart';
+import '../providers/tap_page_index.dart';
+
 import './manage_screen.dart';
-import './choose_ex_screen.dart';
+import './calendar_screen.dart';
+import './functions_screen.dart';
+import './home_screen.dart';
 
-class TabScreen extends StatefulWidget {
-  @override
-  _TabScreenState createState() => _TabScreenState();
-}
+import '../widgets/filters_dialog.dart';
 
-class _TabScreenState extends State<TabScreen> {
-  var _curIdx = 0;
-  List<Widget> _pages;
-  List<String> _exList = [];
+class TabScreen extends StatelessWidget {
+  final List<Map<String, Object>> _pages = [
+    {'title': 'MUPPLER', 'page': HomeScreen()},
+    {'title': '', 'page': CalendarScreen()},
+    {'title': '내가 하는 운동 목록', 'page': ManageScreen()},
+    {'title': '다양한 기능을 사용해보세요.', 'page': FuncionsScreen()},
+  ];
 
-  Map<String, bool> _filters = {'undefined': true};
-  List<Event> _events = [];
-
-  // DateTime selectedDay = DateTime.now();
-  // String _selectedEx;
-
-  // initState
-  @override
-  void initState() {
-    _pages = [
-      HomeScreen(
-        routeManageScreen,
-        _events,
-        switchToCalendarScreen,
-      ),
-      CalendarScreen(
-        _events,
-        _filters,
-        routeAddEventScreen,
-        _exList,
-        deleteEvent,
-      ),
-      TrackingScreen(_events, routeChooseExScreen, deleteEvent, _exList),
-    ];
-    super.initState();
+  Future<void> fetchAndSetDatas(BuildContext ctx) async {
+    await Provider.of<Events>(ctx, listen: false).fetchAndSetEvents();
+    await Provider.of<Routines>(ctx, listen: false).fetchAndSetRotuines();
+    final ids =
+        await Provider.of<Exercises>(ctx, listen: false).fetchAndSetExercises();
+    Provider.of<Filters>(ctx, listen: false).addFilters(ids);
   }
 
-  // tap BottomNavigationBar
-  void _onTap(idx) {
-    setState(() {
-      _curIdx = idx;
-    });
-  }
-
-  // tap 오늘의 운동 목록관리
-  void switchToCalendarScreen() {
-    setState(() {
-      _curIdx = 1;
-    });
-  }
-
-  // tap 종목 관리 스크린
-  Future routeManageScreen() {
-    return Navigator.of(context).push(MaterialPageRoute(
-      builder: (bctx) => ManageScreen(
-        _exList,
-        deleteEx,
-        addEx,
-      ),
-    ));
-  }
-
-  // 운동종목 선택 화면 route.
-  Future routeChooseExScreen(String preSelectedEx) {
-    return Navigator.of(context).push(MaterialPageRoute(
-        builder: (ctx) =>
-            ChooseExScreen(preSelectedEx, _exList, routeManageScreen)));
-  }
-
-  // 운동event 추가 화면 route 및 event 추가
-  Future routeAddEventScreen({DateTime date, Event oldEvent}) {
-    return Navigator.of(context).push(MaterialPageRoute(
-        builder: (ctx) => AddEventScreen(
-              routeChooseExScreen,
-              date: date,
-              oldEvent: oldEvent,
-            )));
-  }
-
-  // event 삭제
-  void deleteEvent(String id) {
-    _events.removeWhere((test) => test.id == id);
-  }
-
-// 운동종목 추가
-  void addEx(String ex) {
-    _exList.add(ex);
-    _filters.addAll({ex: true});
-  }
-
-// 운동종목 삭제
-  void deleteEx(int exIdx, bool deleteAll) {
-    _filters.remove(_exList[exIdx]);
-    _exList.removeAt(exIdx);
-    // 해당운동 기록 전부 삭제.
-    // if (!deleteAll) {
-    //   // _eventsPerEx[name].forEach((test) {
-    //   //   test.exercise = 'undefined';
-    //   // });
-    //   _eventsPerEx['undefined'].addAll(_eventsPerEx[name] ?? []);
-    // }
-  }
+  // tap set Filter button
 
   @override
   Widget build(BuildContext context) {
     print('build tapScreen!');
     return Scaffold(
       appBar: AppBar(
-        title: Text('work out tracker'),
+        leading: Consumer<TapPageIndex>(
+          builder: (ctx, pageIdx, _) {
+            if (pageIdx.curIdx == 3 && pageIdx.funcPageIdx > 0) {
+              return IconButton(
+                  icon: Icon(Icons.keyboard_arrow_left_rounded),
+                  onPressed: () {
+                    pageIdx.moveFuncPage(0);
+                  });
+            } else {
+              return Container();
+            }
+          },
+        ),
+        title: Consumer<TapPageIndex>(
+          builder: (ctx, pageIdx, _) => Text(
+            _pages[pageIdx.curIdx]['title'],
+            style: Theme.of(context).appBarTheme.titleTextStyle.copyWith(
+                fontSize: pageIdx.curIdx == 0 ? 34 : 24,
+                color: pageIdx.curIdx == 0 ? Colors.deepOrange : Colors.white,
+                fontWeight:
+                    pageIdx.curIdx == 0 ? FontWeight.w900 : FontWeight.bold),
+          ),
+        ),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.teal[400],
+            height: 2,
+          ),
+          preferredSize: Size.fromHeight(2),
+        ),
       ),
-      body: _pages[_curIdx],
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '홈',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: '달력',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center),
-            label: '종목',
-          ),
-        ],
-        currentIndex: _curIdx,
-        onTap: _onTap,
+      body: FutureBuilder(
+        future: fetchAndSetDatas(context),
+        builder: (ctx, snapshot) {
+          return snapshot.connectionState == ConnectionState.waiting
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Consumer<TapPageIndex>(
+                  builder: (ctx, pageIdx, _) => _pages[pageIdx.curIdx]['page'],
+                );
+        },
+      ),
+      bottomNavigationBar: Consumer<TapPageIndex>(
+        builder: (ctx, pageIdx, _) => BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: '홈',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: '달력',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.fitness_center),
+              label: '운동',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.timer),
+              label: '기능',
+            ),
+          ],
+          currentIndex: pageIdx.curIdx,
+          onTap: (idx) {
+            pageIdx.movePage(idx);
+          },
+        ),
       ),
     );
   }

@@ -1,84 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../models/event.dart';
-import '../widgets/event_list.dart';
+import '../providers/events.dart';
+import '../providers/exercises.dart';
+import '../widgets/exercise_list.dart';
+import '../widgets/display_events.dart';
 
 class TrackingScreen extends StatefulWidget {
-  final List<Event> _events;
-  final Function _routeChooseExScreen;
-  final Function deleteEvent;
-  final List<String> _exList;
-  // final String selectedEx;
-  TrackingScreen(
-    // this.selectedEx,
-    this._events,
-    this._routeChooseExScreen,
-    this.deleteEvent,
-    this._exList,
-  );
+  static const routeName = '/tracking_screen';
+
   @override
   _TrackingScreenState createState() => _TrackingScreenState();
 }
 
 class _TrackingScreenState extends State<TrackingScreen> {
-  String _selectedEx;
-  List<Event> _selectedEvents = [];
+  String selectedId;
+  Exercises exercises;
 
-  // tap Choose Exercise button
-  void _tapChooseEx() {
-    widget._routeChooseExScreen(_selectedEx).then((ret) {
-      if (ret != null && ret != _selectedEx) {
-        setState(() {
-          _selectedEx = ret as String;
-          _selectedEvents = widget._events
-              .where((test) => test.exercise == _selectedEx)
-              .toList();
-          _selectedEvents.sort((a, b) => b.date.compareTo(a.date));
-        });
-      } else if (!widget._exList.contains(_selectedEx)) {
-        setState(() {
-          _selectedEx = null;
-        });
-      }
-    });
+  @override
+  void initState() {
+    exercises = Provider.of<Exercises>(context, listen: false);
+    super.initState();
   }
 
-  // delete Event
-  void _deleteEvent(String id) {
-    setState(() {
-      widget.deleteEvent(id);
-      _selectedEvents.removeWhere((test) => test.id == id);
-    });
+  Widget get nameBox {
+    return Row(
+      children: [
+        TextButton(
+            onPressed: () async {
+              final changedId = await showDialog(
+                barrierDismissible: true,
+                context: context,
+                builder: (bctx) => AlertDialog(
+                  scrollable: true, //
+                  title: Text('운동선택'),
+                  content:
+                      ExerciseList(isForSelect: true, selectedId: selectedId),
+                ),
+              );
+              if (changedId == null) {
+                return;
+              }
+              if (changedId != selectedId) {
+                setState(() {
+                  selectedId = changedId;
+                });
+              }
+            },
+            child: selectedId == null
+                ? Text('운동 선택')
+                : Text('${exercises.getExercise(selectedId).name}'))
+      ],
+    );
   }
 
-  // build exercise Selection Button
-  Widget get _exSelectionButton {
+  Widget get functionRow {
     return Row(
       children: [
         Expanded(
-          child: RaisedButton(
-            child: _selectedEx == null
-                ? Text('선택된 운동이 없습니다.')
-                : Text('선택된 운동: $_selectedEx'),
-            onPressed: _tapChooseEx,
-          ),
-        ),
-        Text('기간:'),
-        Container(
-          child: RaisedButton(
-            child: Text('-'),
-            onPressed: null,
-          ),
-          width: 30,
-        ),
-        Container(
-          child: RaisedButton(
-            child: Text('-'),
-            onPressed: null,
-          ),
-          width: 30,
-        ),
+            child: ElevatedButton(onPressed: () {}, child: Text('기록으로 보기'))),
+        Expanded(
+            child: ElevatedButton(onPressed: () {}, child: Text('그래프로 보기'))),
       ],
+    );
+  }
+
+  Widget get eventsColumn {
+    return Expanded(
+      child: DisplayEvents(
+        isTrackedEvents: true,
+        exerciseId: selectedId,
+      ),
     );
   }
 
@@ -86,19 +78,9 @@ class _TrackingScreenState extends State<TrackingScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          '특정 운동의 종목을 선택하세요.',
-          style: TextStyle(
-            fontSize: 20,
-          ),
-        ),
-        _exSelectionButton,
-        Expanded(
-            child: EventList(
-          selectedEvents: _selectedEvents,
-          isDateVisible: true,
-          deleteEvent: _deleteEvent,
-        )),
+        nameBox,
+        functionRow,
+        eventsColumn,
       ],
     );
   }
