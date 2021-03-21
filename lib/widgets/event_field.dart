@@ -7,9 +7,9 @@ import '../widgets/memo_dialog.dart';
 import '../providers/exercises.dart';
 import '../models/event.dart';
 
+// ************ custom field for event ************ //
 class EventField extends FormField<Event> {
   EventField({
-    Key key,
     FormFieldSetter<Event> onSaved,
     FormFieldValidator<Event> validator,
     Event initialValue,
@@ -18,7 +18,6 @@ class EventField extends FormField<Event> {
     TextEditingController weightController,
     TextEditingController repController,
   }) : super(
-          key: key,
           onSaved: onSaved,
           validator: validator,
           initialValue: initialValue,
@@ -31,7 +30,7 @@ class EventField extends FormField<Event> {
         );
 }
 
-// ************ today exercises column ************ //
+// ************ event Field box ************ //
 class EventFieldBox extends StatefulWidget {
   final FormFieldState<Event> state;
   final bool isEdit;
@@ -94,30 +93,46 @@ class _EventFieldBoxState extends State<EventFieldBox> {
     widget.state.didChange(event.copyWith(exerciseId: exerciseId));
   }
 
-  Widget get nameRow {
+  // ************ title Row ************ //
+  Widget get titleRow {
     final exercise = Provider.of<Exercises>(context, listen: false)
         .getExercise(event.exerciseId);
     print(exercise.name);
     return Row(
-      // mainAxisAlignment: MainAxis,
       children: [
         if (!widget.isEdit)
           IconButton(
-            icon: isHide
-                ? Icon(Icons.keyboard_arrow_right)
-                : Icon(Icons.keyboard_arrow_down),
+            icon: isHide ? Icon(Icons.expand_less) : Icon(Icons.expand_more),
             onPressed: () => setState(() {
               isHide = !isHide;
             }),
           ),
+        Chip(
+          backgroundColor: Colors.white,
+          padding: const EdgeInsets.all(0.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+            side: BorderSide(
+              color: Colors.black26,
+              width: 1,
+            ),
+          ),
+          label: Text(
+            exercise.target.value,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.teal),
+          ),
+        ),
+        SizedBox(
+          width: 10,
+        ),
         Expanded(
-          child: Row(
-            children: [
-              Chip(
-                label: Text(exercise.target.value),
-              ),
-              Text(exercise.name),
-            ],
+          child: Text(
+            exercise.name,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
         ),
         if (widget.isEdit)
@@ -126,18 +141,20 @@ class _EventFieldBoxState extends State<EventFieldBox> {
     );
   }
 
+// ************ event summary row ************ //
   Widget get summaryRow {
-    String volume = 'volume: ${event.volume}' +
-        (event.type == DetailType.basic ? 'kg' : '개');
+    final vol = event.volume.toString() +
+        (event.type == DetailType.onlyRep ? '개' : 'kg');
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Text('${event.setDetails.length}세트'),
-        Text(volume),
+        Text('세트 수 : ${event.setDetails.length}'),
+        Text('Volume : $vol')
       ],
     );
   }
 
+// ************ event summary row ************ //
   Widget get hiddenBox {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,6 +168,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
     );
   }
 
+// ************ memo box ************ //
   Widget get memoBox {
     return GestureDetector(
       onTap: () => onTapMemo(),
@@ -283,7 +301,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
       crossAxisAlignment: CrossAxisAlignment.start,
       // builder등으로 분리해서 정리.
       children: [
-        nameRow,
+        titleRow,
         summaryRow,
         if (!isHide) hiddenBox,
       ],

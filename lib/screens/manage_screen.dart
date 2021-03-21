@@ -23,7 +23,8 @@ class _ManageScreenState extends State<ManageScreen> {
           style: ButtonStyle(
             side: MaterialStateProperty.resolveWith<BorderSide>(
               (_) => BorderSide(
-                  color: curIdx == i ? Colors.teal : Colors.white, width: 1),
+                  color: curIdx == i ? Colors.deepOrange : Colors.white,
+                  width: 1),
             ),
           ),
           child: Text(
@@ -31,7 +32,7 @@ class _ManageScreenState extends State<ManageScreen> {
             style: TextStyle(
                 // fontSize: curIdx == i ? 15 : 14,
                 fontWeight: curIdx == i ? FontWeight.bold : FontWeight.normal,
-                color: curIdx == i ? Colors.teal : Colors.black),
+                color: curIdx == i ? Colors.deepOrange : Colors.black),
           ),
           onPressed: () {
             setState(() {

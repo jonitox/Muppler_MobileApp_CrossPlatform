@@ -139,7 +139,7 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
                   vertical: 8,
                 ),
                 child: Text(
-                  '정보를 입력하세요.  길게 누르면 순서를 변경할수 있습니다.',
+                  '타일을 길게 누르면 순서를 변경할수 있습니다.',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   softWrap: true,
