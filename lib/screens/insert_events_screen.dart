@@ -31,6 +31,7 @@ class InsertEventsScreen extends StatefulWidget {
 
 class _InsertEventsScreenState extends State<InsertEventsScreen> {
   final _key = GlobalKey<FormState>();
+
   int _itemCount;
   DateTime day;
   List<Event> events;
@@ -39,6 +40,9 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
 
   Routines routines;
   Routine routine;
+
+  ScrollController _scrollController;
+
   @override
   void initState() {
     routines = Provider.of<Routines>(context, listen: false);
@@ -71,6 +75,8 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
         List.generate(_itemCount, (_) => TextEditingController());
     repControllers = List.generate(_itemCount, (_) => TextEditingController());
 
+    _scrollController = ScrollController();
+
     super.initState();
   }
 
@@ -78,7 +84,7 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
   void dispose() {
     weightControllers.forEach((element) => element.dispose());
     repControllers.forEach((element) => element.dispose());
-
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -128,44 +134,49 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
     );
   }
 
+  // ************ tip box ************ //
+  Widget get reorderTipBox {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 15,
+        vertical: 8,
+      ),
+      child: Text(
+        '타일을 길게 누르면 순서를 변경할수 있습니다.',
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        softWrap: true,
+      ),
+    );
+  }
+
   // ************ event tiles list ************ //
   Widget get eventTilesList {
-    return Expanded(
-      child: ReorderableListView.builder(
-        header: _itemCount > 0
-            ? Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 8,
-                ),
-                child: Text(
-                  '타일을 길게 누르면 순서를 변경할수 있습니다.',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: true,
-                ),
-              )
-            : null,
-        onReorder: (oldIdx, newIdx) {
-          setState(() {
-            if (newIdx > oldIdx) {
-              newIdx -= 1;
-            }
-            final ev = events.removeAt(oldIdx);
-            final wc = weightControllers.removeAt(oldIdx);
-            final rc = repControllers.removeAt(oldIdx);
-            weightControllers.insert(newIdx, wc);
-            repControllers.insert(newIdx, rc);
-            events.insert(newIdx, ev);
-          });
-        },
-        itemCount: _itemCount,
-        itemBuilder: (ctx, i) => Card(
+    return ReorderableList(
+      controller: _scrollController,
+      shrinkWrap: true,
+      onReorder: (oldIdx, newIdx) {
+        setState(() {
+          if (newIdx > oldIdx) {
+            newIdx -= 1;
+          }
+          final ev = events.removeAt(oldIdx);
+          final wc = weightControllers.removeAt(oldIdx);
+          final rc = repControllers.removeAt(oldIdx);
+          weightControllers.insert(newIdx, wc);
+          repControllers.insert(newIdx, rc);
+          events.insert(newIdx, ev);
+        });
+      },
+      itemCount: _itemCount,
+      itemBuilder: (ctx, i) => ReorderableDelayedDragStartListener(
+        index: i,
+        key: ValueKey(events[i].exerciseId),
+        child: Card(
           margin: const EdgeInsets.symmetric(
             horizontal: 12,
             vertical: 8,
           ),
-          key: ValueKey(events[i].exerciseId),
           elevation: 3,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
@@ -184,8 +195,8 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
                 events[i] = ev;
               },
               validator: (ev) => null,
-              weightController: weightControllers[i],
-              repController: repControllers[i],
+              // weightController: weightControllers[i],
+              // repController: repControllers[i],
             ),
           ),
         ),
@@ -217,23 +228,28 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
   @override
   Widget build(BuildContext context) {
     print('build Insert Events Screen!');
-
-    return Scaffold(
-      appBar: AppBar(
+    final _appBar = AppBar(
         title: widget.isForRoutine
             ? (widget.isRawInsert ? Text('루틴을 구성하세요.') : Text('루틴을 수정하세요.'))
-            : Text('추가: ${DateFormat('M월 d일').format(day)}의 운동'),
-      ),
+            : Text('추가: ${DateFormat('M월 d일').format(day)}의 운동'));
+
+    return Scaffold(
+      // resizeToAvoidBottomInset: false,
+      appBar: _appBar,
+
       body: SafeArea(
         child: Form(
           key: _key,
-          child: Column(
-            children: [
-              if (widget.isForRoutine) routineTitleBox,
-              eventTilesList,
-              Divider(),
-              jobCompleteRow,
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                if (widget.isForRoutine) routineTitleBox,
+                if (_itemCount > 1) reorderTipBox,
+                eventTilesList,
+                Divider(),
+                jobCompleteRow,
+              ],
+            ),
           ),
         ),
       ),

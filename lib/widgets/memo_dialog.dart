@@ -1,56 +1,128 @@
 import 'package:flutter/material.dart';
 
 class MemoDialog extends StatefulWidget {
-  String memo;
-  MemoDialog(this.memo);
+  final String memo;
+  final String exerciseName;
+  MemoDialog(this.exerciseName, this.memo);
   @override
   _MemoDialogState createState() => _MemoDialogState();
 }
 
 class _MemoDialogState extends State<MemoDialog> {
-  TextEditingController memoController; //
   String savedMemo;
   final _formKey = GlobalKey<FormState>();
-  @override
-  void initState() {
-    memoController = TextEditingController();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    memoController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final deviceSize = MediaQuery.of(context).size;
+    final themeData = Theme.of(context);
     return AlertDialog(
       scrollable: true,
+      // ************ memo title ************ //
+      title: Container(
+        width: deviceSize.width * 0.5,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: deviceSize.width * 0.3),
+              child: Text(
+                '${widget.exerciseName}',
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                strutStyle: StrutStyle(
+                  height: 1,
+                ),
+                style: TextStyle(fontSize: 18, height: 1),
+              ),
+            ),
+            Text(
+              '의 메모',
+              softWrap: false,
+              strutStyle: StrutStyle(
+                height: 1,
+              ),
+              style: TextStyle(fontSize: 18, height: 1),
+            ),
+          ],
+        ),
+      ),
       content: Form(
         key: _formKey,
-        child: Column(
-          children: [
-            TextFormField(
-              initialValue: widget.memo,
-              onSaved: (value) => savedMemo = value,
-            ),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text('취소'),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // ************ memo box(text form field) ************ //
+              Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 5,
                 ),
-                TextButton(
-                  onPressed: () {
-                    _formKey.currentState.save();
-                    Navigator.of(context).pop(savedMemo);
-                  },
-                  child: Text('확인'),
-                )
-              ],
-            )
-          ],
+                decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: Colors.black54),
+                    borderRadius: BorderRadius.circular(10)),
+                width: deviceSize.width * 0.8,
+                child: TextFormField(
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  maxLines: 6,
+                  autofocus: true,
+                  style: TextStyle(fontSize: 18),
+                  decoration: InputDecoration(
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: themeData.accentColor),
+                    ),
+                    border: UnderlineInputBorder(
+                      borderSide: BorderSide(color: themeData.accentColor),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: themeData.accentColor),
+                    ),
+                  ),
+                  initialValue: widget.memo,
+                  onSaved: (value) => savedMemo = value,
+                ),
+              ),
+              // ************ completition ************ //
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      width: deviceSize.width * 0.2,
+                      child: Center(
+                        child: Text(
+                          '취소',
+                          style: TextStyle(fontSize: 15, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      _formKey.currentState.save();
+                      print(savedMemo);
+                      Navigator.of(context).pop(savedMemo);
+                    },
+                    child: Container(
+                      width: deviceSize.width * 0.2,
+                      child: Center(
+                        child: Text(
+                          '저장',
+                          style: TextStyle(fontSize: 15, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

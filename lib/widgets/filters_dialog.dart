@@ -44,7 +44,7 @@ class FiltersDialog extends StatelessWidget {
 
       title: FittedBox(
         child: Text(
-          '달력에 표시할 운동을 변경해보세요.',
+          '달력에 표시될 운동을 변경해보세요.',
           overflow: TextOverflow.visible,
         ),
       ),

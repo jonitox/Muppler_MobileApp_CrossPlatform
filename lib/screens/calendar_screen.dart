@@ -105,19 +105,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget get addEventButton {
     final deviceSize = MediaQuery.of(context).size;
     final themeData = Theme.of(context);
-    return OutlinedButton(
+    return ElevatedButton(
       style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+          (_) => themeData.accentColor,
+        ),
         minimumSize: MaterialStateProperty.resolveWith<Size>(
             (_) => Size(deviceSize.width * 0.5, 40)),
-        side: MaterialStateProperty.resolveWith<BorderSide>(
-          (_) => BorderSide(color: themeData.accentColor, width: 0.8),
-        ),
+        // side: MaterialStateProperty.resolveWith<BorderSide>(
+        //   (_) => BorderSide(color: Colors.grey, width: 1),
+        // ),
       ),
       child: Text(
         '운동 추가하기',
         style: TextStyle(
           fontSize: 18,
-          color: themeData.accentColor,
+          color: Colors.white,
         ),
       ),
       onPressed: () =>

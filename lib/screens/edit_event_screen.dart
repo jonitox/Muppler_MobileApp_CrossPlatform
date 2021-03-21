@@ -69,8 +69,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
                   events.updateEvent(event.id, ev.copyWith(id: event.id));
                 },
                 validator: (ev) => null,
-                weightController: weightController,
-                repController: repController,
+                // weightController: weightController,
+                // repController: repController,
               ),
               Row(
                 children: [

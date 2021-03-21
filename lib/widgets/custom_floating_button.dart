@@ -17,7 +17,7 @@ class CustomFloatingButton extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 10),
-        width: deviceSize.width * 0.3,
+        width: deviceSize.width * 0.4,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -36,7 +36,8 @@ class CustomFloatingButton extends StatelessWidget {
                   ),
                 Text(
                   name,
-                  style: TextStyle(fontWeight: FontWeight.bold, color: color),
+                  style: TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold, color: color),
                 )
               ],
             ),

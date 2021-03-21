@@ -18,7 +18,7 @@ class TabScreen extends StatelessWidget {
   final List<Map<String, Object>> _pages = [
     {'title': 'MUPPLER', 'page': HomeScreen()},
     {'title': '', 'page': CalendarScreen()},
-    {'title': '내가 하는 운동 목록', 'page': ManageScreen()},
+    {'title': '운동/루틴 라이브러리', 'page': ManageScreen()},
     {'title': '다양한 기능을 사용해보세요.', 'page': FuncionsScreen()},
   ];
 
@@ -90,11 +90,11 @@ class TabScreen extends StatelessWidget {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today),
-              label: '달력',
+              label: '운동 기록',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.fitness_center),
-              label: '운동',
+              label: '라이브러리',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.timer),

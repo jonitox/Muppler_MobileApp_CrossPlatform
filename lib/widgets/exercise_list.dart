@@ -167,7 +167,8 @@ class _ExerciseListState extends State<ExerciseList> {
       // for filters dialog
       return Consumer<Filters>(
         builder: (ctx, filters, ch) {
-          return SwitchListTile(
+          return SwitchListTile.adaptive(
+            key: key,
             activeColor: Colors.teal,
             value: filters.items[ex.id],
             title: ch,
@@ -184,9 +185,14 @@ class _ExerciseListState extends State<ExerciseList> {
       );
     } else
       // for manage screen
-      return Container(
+      return GestureDetector(
         key: key,
-        color: Colors.white,
+        // color: Colors.white,
+        onTap: () => showDialog(
+          context: context,
+          builder: (bctx) => ExerciseDialog(false, ex.target.value, id: ex.id),
+          barrierDismissible: true,
+        ),
         child: ListTile(
           title: Text(
             ex.name,
@@ -194,17 +200,11 @@ class _ExerciseListState extends State<ExerciseList> {
             overflow: TextOverflow.ellipsis,
           ),
           trailing: IconButton(
-            icon: Icon(
-              Icons.info_outline,
-              // color: Colors,
-            ),
-            onPressed: () => showDialog(
-              context: context,
-              builder: (bctx) =>
-                  ExerciseDialog(false, ex.target.value, id: ex.id),
-              barrierDismissible: true,
-            ),
-          ),
+              icon: Icon(
+                Icons.info_outline,
+                // color: Colors,
+              ),
+              onPressed: () {}),
         ),
       );
   }
@@ -227,7 +227,7 @@ class _ExerciseListState extends State<ExerciseList> {
         : btn;
   }
 
-// ************ build exercise list with cartegory ************ //
+// ************ build widget(exercise list with cartegory) ************ //
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;

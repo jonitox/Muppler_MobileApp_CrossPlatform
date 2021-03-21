@@ -6,6 +6,7 @@ import '../widgets/memo_dialog.dart';
 
 import '../providers/exercises.dart';
 import '../models/event.dart';
+import '../models/exercise.dart';
 
 // ************ custom field for event ************ //
 class EventField extends FormField<Event> {
@@ -15,8 +16,8 @@ class EventField extends FormField<Event> {
     Event initialValue,
     bool isEdit,
     bool isForRoutine = false,
-    TextEditingController weightController,
-    TextEditingController repController,
+    // TextEditingController weightController,
+    // TextEditingController repController,
   }) : super(
           onSaved: onSaved,
           validator: validator,
@@ -24,21 +25,28 @@ class EventField extends FormField<Event> {
           // autovalidate: false, //
           builder: (FormFieldState<Event> state) {
             print('call builder!');
-            return EventFieldBox(state, isEdit, isForRoutine, weightController,
-                repController); // named로
+            return EventFieldBox(
+              state,
+              isEdit,
+              isForRoutine,
+            ); // named로
           },
         );
 }
 
-// ************ event Field box ************ //
+//// ******************************* event Field box ******************************* ////
+///
 class EventFieldBox extends StatefulWidget {
   final FormFieldState<Event> state;
   final bool isEdit;
   final bool isForRoutine;
-  final TextEditingController weightController;
-  final TextEditingController repController;
-  EventFieldBox(this.state, this.isEdit, this.isForRoutine,
-      this.weightController, this.repController);
+  // final TextEditingController weightController;
+  // final TextEditingController repController;
+  EventFieldBox(
+    this.state,
+    this.isEdit,
+    this.isForRoutine,
+  );
 
   @override
   _EventFieldBoxState createState() => _EventFieldBoxState();
@@ -47,8 +55,14 @@ class EventFieldBox extends StatefulWidget {
 class _EventFieldBoxState extends State<EventFieldBox> {
   bool isHide;
   Event event;
+  Exercises exercises;
+  Exercise exercise;
+  double weight = 1115;
+  int repetition = 6;
+
   @override
   void initState() {
+    exercises = Provider.of<Exercises>(context, listen: false);
     isHide = false;
     print('init event field!');
 
@@ -61,20 +75,33 @@ class _EventFieldBoxState extends State<EventFieldBox> {
     super.dispose();
   }
 
+  String removeDecimalZeroFormat(double n) {
+    return n.toString().replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
+  }
+
+  // ************ on Tap memo Box ************ //
   Future<void> onTapMemo() async {
     String memo = await showDialog(
-      barrierDismissible: true,
+      barrierDismissible: false,
       context: context,
-      builder: (bctx) => MemoDialog(event.memo),
+      builder: (bctx) => MemoDialog(exercise.name, event.memo),
     );
     if (memo == null) {
       return;
     }
+    print('hey');
+    print(memo);
     // event.memo = memo; // copywith(event)로하려면 필요. // 내부적으로 뭐가 더 나은지? // 사실 copywith로 매번 다시만들어서쓰는거보다 있는 event쓰는게 더 효율적일것같긴함. // 나중에 변경
     // event.memo = 'aa';
     widget.state.didChange(event.copyWith(memo: memo));
   }
 
+  void onTapSetRow({double w, int r, bool isNew, int setNumber}) async {
+    // await showModalBottomSheet(context: context, builder: builder);
+    print('tap!');
+  }
+
+  // ************ on Tap Change Exercise when editing event ************ //
   Future<void> onTapChangeExercise() async {
     String exerciseId = await showDialog(
       barrierDismissible: true,
@@ -95,17 +122,26 @@ class _EventFieldBoxState extends State<EventFieldBox> {
 
   // ************ title Row ************ //
   Widget get titleRow {
-    final exercise = Provider.of<Exercises>(context, listen: false)
-        .getExercise(event.exerciseId);
-    print(exercise.name);
     return Row(
       children: [
         if (!widget.isEdit)
-          IconButton(
-            icon: isHide ? Icon(Icons.expand_less) : Icon(Icons.expand_more),
-            onPressed: () => setState(() {
-              isHide = !isHide;
-            }),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon:
+                    isHide ? Icon(Icons.expand_more) : Icon(Icons.expand_less),
+                onPressed: () => setState(() {
+                  isHide = !isHide;
+                }),
+              ),
+              Positioned(
+                  bottom: 1,
+                  child: Text(
+                    isHide ? '펼치기' : '숨기기',
+                    style: TextStyle(fontSize: 12),
+                  )),
+            ],
           ),
         Chip(
           backgroundColor: Colors.white,
@@ -143,23 +179,28 @@ class _EventFieldBoxState extends State<EventFieldBox> {
 
 // ************ event summary row ************ //
   Widget get summaryRow {
-    final vol = event.volume.toString() +
-        (event.type == DetailType.onlyRep ? '개' : 'kg');
+    final vol = event.volume is double
+        ? removeDecimalZeroFormat(event.volume)
+        : event.volume.toString() +
+            (event.type == DetailType.onlyRep ? '개' : 'kg');
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Text('세트 수 : ${event.setDetails.length}'),
+        Text('총 세트 수 : ${event.setDetails.length}'),
         Text('Volume : $vol')
       ],
     );
   }
 
-// ************ event summary row ************ //
+// ************ hidden box ************ //
   Widget get hiddenBox {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        Divider(
+          thickness: 1.5,
+        ),
         if (!widget.isForRoutine) memoBox,
         insertSetRow,
         insertButtonRow,
@@ -170,43 +211,119 @@ class _EventFieldBoxState extends State<EventFieldBox> {
 
 // ************ memo box ************ //
   Widget get memoBox {
-    return GestureDetector(
-      onTap: () => onTapMemo(),
-      child: Container(
-        width: double.infinity,
-        height: 50,
-        margin: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-            border: Border.all(
-          width: 1,
-        )),
-        child: Text('memo\n${event.memo}'),
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: () => onTapMemo(),
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+            padding: const EdgeInsets.all(5),
+            width: double.infinity,
+            decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.black26),
+                borderRadius: BorderRadius.circular(10)),
+            child: Text(
+              event.memo.trim().length > 0 ? event.memo : 'MEMO',
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 4,
+            ),
+          ),
+        ),
+        Divider(
+          thickness: 1.5,
+        ),
+      ],
     );
   }
 
+  // ************ insert set row ************ //
   Widget get insertSetRow {
     return Row(
       children: [
-        if (event.type == DetailType.basic)
-          Expanded(
-            child: TextField(
-              decoration: InputDecoration(labelText: '무게'),
-              controller: widget.weightController,
-              keyboardType: TextInputType.number,
-              textInputAction: TextInputAction.done,
+        Text('세트 :'),
+        Expanded(
+          child: GestureDetector(
+            onTap: onTapSetRow,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.deepOrange),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (event.type != DetailType.onlyRep)
+                    Row(
+                      children: [
+                        Text(
+                          '${removeDecimalZeroFormat(weight)}',
+                          style: TextStyle(
+                            fontSize: 22,
+                            // decoration: TextDecoration.underline,
+                            // decorationColor: Colors.bl,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        Text(
+                          'kg',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.teal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  Row(
+                    children: [
+                      Text(
+                        '$repetition',
+                        style: TextStyle(
+                          fontSize: 22,
+
+                          // decoration: TextDecoration.underline,
+                          fontStyle: FontStyle.italic,
+                          // decorationColor: Colors.teal,
+                        ),
+                      ),
+                      Text(
+                        '회',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.teal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        if (event.type == DetailType.basic) Text('Kg'),
-        Expanded(
-          child: TextField(
-            decoration: InputDecoration(labelText: '반복수'),
-            controller: widget.repController,
-            keyboardType: TextInputType.number,
-            textInputAction: TextInputAction.done,
-          ),
         ),
-        Text('회'),
+        // if (event.type == DetailType.basic)
+        //   Expanded(
+        //     child: TextField(
+        //       decoration: InputDecoration(labelText: '무게'),
+        //       controller: widget.weightController,
+        //       keyboardType: TextInputType.number,
+        //       textInputAction: TextInputAction.done,
+        //     ),
+        //   ),
+        // if (event.type == DetailType.basic) Text('Kg'),
+        // Expanded(
+        //   child: TextField(
+        //     decoration: InputDecoration(labelText: '반복수'),
+        //     controller: widget.repController,
+        //     keyboardType: TextInputType.number,
+        //     textInputAction: TextInputAction.done,
+        //   ),
+        // ),
+        // Text('회'),
         PopupMenuButton(
           child: event.type == DetailType.basic ? Text('무게,개수') : Text('개수만'),
           itemBuilder: (ctx) => [
@@ -230,16 +347,17 @@ class _EventFieldBoxState extends State<EventFieldBox> {
     );
   }
 
+  // ************ insert set button ************ //
   Widget get insertButtonRow {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         ElevatedButton(
           onPressed: () {
-            event.addSet(Set(
-              double.parse(widget.weightController.text),
-              int.parse(widget.repController.text),
-            ));
+            // event.addSet(Set(
+            //     // double.parse(widget.weightController.text),
+            //     // int.parse(widget.repController.text),
+            //     ));
             widget.state.didChange(event); // memoy leak?
           },
           child: Text('세트 추가'),
@@ -295,6 +413,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
   @override
   Widget build(BuildContext context) {
     event = widget.state.value;
+    exercise = exercises.getExercise(event.exerciseId);
     print('build event field box!');
     print(event.date.toString());
     return Column(
@@ -302,6 +421,9 @@ class _EventFieldBoxState extends State<EventFieldBox> {
       // builder등으로 분리해서 정리.
       children: [
         titleRow,
+        Divider(
+          thickness: 1.5,
+        ),
         summaryRow,
         if (!isHide) hiddenBox,
       ],

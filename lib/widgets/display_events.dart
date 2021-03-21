@@ -89,13 +89,24 @@ class _EventTileState extends State<EventTile> {
         Expanded(
           child: Row(
             children: [
-              IconButton(
-                // constraints: BoxConstraints(maxHeight: 30),
-                icon:
-                    isHide ? Icon(Icons.expand_less) : Icon(Icons.expand_more),
-                onPressed: () => setState(() {
-                  isHide = !isHide;
-                }),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    icon: isHide
+                        ? Icon(Icons.expand_more)
+                        : Icon(Icons.expand_less),
+                    onPressed: () => setState(() {
+                      isHide = !isHide;
+                    }),
+                  ),
+                  Positioned(
+                      bottom: 1,
+                      child: Text(
+                        isHide ? '펼치기' : '숨기기',
+                        style: TextStyle(fontSize: 12),
+                      )),
+                ],
               ),
               if (widget.isTracked)
                 Expanded(
@@ -180,7 +191,7 @@ class _EventTileState extends State<EventTile> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Text('세트 수 : ${widget.event.setDetails.length}'),
+        Text('총 세트 수 : ${widget.event.setDetails.length}'),
         Text('Volume : $vol')
       ],
     );
