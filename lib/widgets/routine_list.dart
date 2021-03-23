@@ -22,66 +22,6 @@ class RoutineList extends StatefulWidget {
 class _RoutineListState extends State<RoutineList> {
   Routines routines;
   String selectedId;
-  // Widget get sortButtonRow {
-  //   return Row(
-  //     children: [
-  //       ElevatedButton(onPressed: () {}, child: Text('추가순')),
-  //       ElevatedButton(onPressed: () {}, child: Text('이름순')),
-  //     ],
-  //   );
-  // }
-
-  // Widget get routinesColumn {
-  //   return Consumer<Routines>(builder: (ctx, routines, child) {
-  //     final items = routines.items;
-  //     print('build routines Column!');
-  //     return Expanded(
-  //       child: Stack(
-  //         alignment: AlignmentDirectional.bottomCenter,
-  //         children: [
-  //           ListView.builder(
-  //             itemCount: items.length,
-  //             itemBuilder: (ctx, i) => GestureDetector(
-  //               onTap: widget.isForinsert
-  //                   ? () {
-  //                       setState(() {
-  //                         selectedId = items[i].id;
-  //                       });
-  //                     }
-  //                   : null,
-  //               child: RoutineTile(
-  //                 isForInsert: widget.isForinsert,
-  //                 isSelected: selectedId == items[i].id,
-  //                 r: items[i],
-  //                 key: ValueKey(items[i].id),
-  //               ),
-  //             ),
-  //           ),
-  //           if (widget.isForinsert)
-  //             TextButton(
-  //               onPressed: () {
-  //                 Navigator.of(context).push(MaterialPageRoute(
-  //                     builder: (ctx) => InsertEventsScreen(
-  //                           isRawInsert: false,
-  //                           isMakeRoutine: false,
-  //                           routineId: selectedId,
-  //                         )));
-  //               },
-  //               child: Text('선택 완료'),
-  //             ),
-  //           if (!widget.isForinsert)
-  //             TextButton(
-  //               onPressed: () {
-  //                 Navigator.of(context)
-  //                     .pushNamed(PickExerciseOnlyScreen.routeName);
-  //               },
-  //               child: Text('루틴 추가하기'),
-  //             ),
-  //         ],
-  //       ),
-  //     );
-  //   });
-  // }
 
   // ************  floating button ************ //
   Widget floatingButton({String text, Function onPressed, IconData icon}) {
@@ -92,6 +32,7 @@ class _RoutineListState extends State<RoutineList> {
     );
   }
 
+  // ************  routine tiles list ************ //
   Widget get routineTilesList {
     return Consumer<Routines>(builder: (ctx, routines, child) {
       final items = routines.items;
@@ -105,26 +46,34 @@ class _RoutineListState extends State<RoutineList> {
               ))
             : Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: ListView.separated(
-                  separatorBuilder: (ctx, i) => Divider(
-                    height: 20,
-                    thickness: 0.8,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                child: ListView.builder(
+                  // separatorBuilder: (ctx, i) => Divider(
+                  //   height: 20,
+                  //   thickness: 0.8,
+                  //   color: Colors.grey,
+                  // ),
                   itemCount: items.length,
                   itemBuilder: (ctx, i) => GestureDetector(
+                    key: ValueKey(items[i].id),
                     onTap: widget.isForinsert
                         ? () {
                             setState(() {
                               selectedId = items[i].id;
                             });
                           }
-                        : null,
+                        : () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (ctx) => InsertEventsScreen(
+                                      isRawInsert: false,
+                                      isForRoutine: true,
+                                      routineId: items[i].id,
+                                    )));
+                          },
                     child: RoutineTile(
                       isForInsert: widget.isForinsert,
                       isSelected: selectedId == items[i].id,
                       r: items[i],
-                      key: ValueKey(items[i].id),
+                      key: ValueKey('id:${items[i].id}'),
                     ),
                   ),
                 ),
@@ -133,7 +82,7 @@ class _RoutineListState extends State<RoutineList> {
     });
   }
 
-  // ************ build routine list ************ //
+  // ************ build routine list with buttons ************ //
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -154,7 +103,7 @@ class _RoutineListState extends State<RoutineList> {
           ),
         if (!widget.isForinsert)
           floatingButton(
-            text: '항목 추가하기',
+            text: '루틴 추가하기',
             onPressed: () => Navigator.of(context)
                 .pushNamed(PickExerciseOnlyScreen.routeName),
             icon: Icons.add,
@@ -170,7 +119,8 @@ class RoutineTile extends StatefulWidget {
   final bool isSelected;
   final Routine r;
   final Key key;
-  RoutineTile({this.isForInsert, this.isSelected, this.r, this.key}); // named로
+  RoutineTile({this.isForInsert, this.isSelected, this.r, this.key})
+      : super(key: key); // named로
   @override
   _RoutineTileState createState() => _RoutineTileState();
 }
@@ -185,50 +135,66 @@ class _RoutineTileState extends State<RoutineTile> {
     super.initState();
   }
 
+  // remove fractional parts of double
+  String removeDecimalZeroFormat(double n) {
+    return n.toString().replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
+  }
+
   // ************  routine title row ************ //
   Widget get routineTitleRow {
+    final themeData = Theme.of(context);
     return Row(
       children: [
-        IconButton(
-          icon: isHide ? Icon(Icons.expand_less) : Icon(Icons.expand_more),
-          onPressed: () => setState(() {
-            isHide = !isHide;
-          }),
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            IconButton(
+              icon: isHide ? Icon(Icons.expand_more) : Icon(Icons.expand_less),
+              onPressed: () => setState(() {
+                isHide = !isHide;
+              }),
+            ),
+            Positioned(
+                bottom: 1,
+                child: Text(
+                  isHide ? '펼치기' : '숨기기',
+                  style: TextStyle(fontSize: 12),
+                )),
+          ],
         ),
         Expanded(
             child: Text(
           widget.r.name,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           overflow: TextOverflow.ellipsis,
           softWrap: false,
         )),
         Text(
-          '총 ${widget.r.numberOfSets}세트 ',
+          '총 ${widget.r.items.length}개의 운동 ',
           style: TextStyle(
-            color: Colors.blue,
+            color: themeData.primaryColor,
             fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ),
         Text(
-          '볼륨 ${widget.r.volume}kg',
+          '총 ${widget.r.numberOfSets}세트 ',
           style: TextStyle(
-            color: Colors.red,
+            color: Colors.blueGrey,
             fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ),
-        if (widget.isForInsert && widget.isSelected) Icon(Icons.check_outlined),
-        if (!widget.isForInsert)
-          IconButton(
-            icon: Icon(Icons.info_outlined),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (ctx) => InsertEventsScreen(
-                        isRawInsert: false,
-                        isForRoutine: true,
-                        routineId: widget.r.id,
-                      )));
-            },
+        Text(
+          '볼륨 ${removeDecimalZeroFormat(widget.r.volume)}kg',
+          style: TextStyle(
+            color: themeData.accentColor,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
+        ),
+        if (widget.isForInsert)
+          Icon(widget.isSelected ? Icons.check_outlined : null),
       ],
     );
   }
@@ -239,6 +205,9 @@ class _RoutineTileState extends State<RoutineTile> {
       Exercise exercise = exercises.getExercise(e.exerciseId);
       return Column(
         children: [
+          Divider(
+            thickness: 1.5,
+          ),
           Row(
             children: [
               Chip(
@@ -267,31 +236,28 @@ class _RoutineTileState extends State<RoutineTile> {
                     exercise.name,
                     overflow: TextOverflow.ellipsis,
                     softWrap: false,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
-              Text('세트 수 : ${e.setDetails.length} / 볼륨: ${e.volume}' +
-                  (e.type == DetailType.onlyRep ? '개' : 'kg')),
+              Text(
+                  '세트 수: ${e.setDetails.length}  볼륨: ${e.type == DetailType.basic ? removeDecimalZeroFormat(e.volume) : e.volume}' +
+                      (e.type == DetailType.onlyRep ? '개' : 'kg')),
             ],
           ),
-          if (!isHide)
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: e.setDetails.length,
-              itemBuilder: (ctx, i) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text('${i + 1}세트'),
-                  if (e.type == DetailType.basic)
-                    Text('${e.setDetails[i].weight}Kg'),
-                  Text('${e.setDetails[i].rep}회'),
-                ],
-              ),
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: e.setDetails.length,
+            itemBuilder: (ctx, i) => Row(
+              key: ValueKey('${e.id} #$i'),
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text('${i + 1}세트'),
+                if (e.type == DetailType.basic)
+                  Text('${removeDecimalZeroFormat(e.setDetails[i].weight)}Kg'),
+                Text('${e.setDetails[i].rep}회'),
+              ],
             ),
-          Divider(
-            thickness: 1,
-            height: 8,
           ),
         ],
       );
@@ -317,10 +283,7 @@ class _RoutineTileState extends State<RoutineTile> {
           mainAxisSize: MainAxisSize.min,
           children: [
             routineTitleRow,
-            Divider(
-              thickness: 1.5,
-            ),
-            ...eventsBox,
+            if (!isHide) ...eventsBox,
           ],
         ),
       ),

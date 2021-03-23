@@ -99,10 +99,7 @@ class Calendar extends StatelessWidget {
           final children = <Widget>[];
           if (events.isNotEmpty) {
             children.add(
-              Positioned(
-                // bottom: -1,
-                child: _buildEventsMarker(date, events),
-              ),
+              _buildEventsMarker(date, events),
             );
           }
           return children;
@@ -130,14 +127,16 @@ class Calendar extends StatelessWidget {
       ),
       width: 16.0,
       height: 16.0,
-      child: Center(
-        child: Text(
-          '${events.length}',
-          style: TextStyle().copyWith(
-            color: calendarController.isSelected(date)
-                ? Colors.white
-                : Colors.black,
-            fontSize: 12.0,
+      child: FittedBox(
+        child: Center(
+          child: Text(
+            '${events.length}',
+            style: TextStyle().copyWith(
+              color: calendarController.isSelected(date)
+                  ? Colors.white
+                  : Colors.black,
+              fontSize: 12.0,
+            ),
           ),
         ),
       ),

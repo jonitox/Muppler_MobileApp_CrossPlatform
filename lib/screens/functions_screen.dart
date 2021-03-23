@@ -62,7 +62,11 @@ class FuncionsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           trackingBox(pageState),
-          Divider(),
+          Divider(
+            height: 20,
+            thickness: 0.8,
+            color: Theme.of(context).primaryColor, // theme
+          ),
           timerBox(pageState),
         ],
       );

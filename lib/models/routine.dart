@@ -36,12 +36,13 @@ class Routine {
   }
 
   bool containExercise(String exerciseId) {
+    bool tag = false;
     items.forEach((e) {
       if (e.exerciseId == exerciseId) {
-        return true;
+        tag = true;
       }
     });
-    return false;
+    return tag;
   }
 
 // const _createRoutinesTable =

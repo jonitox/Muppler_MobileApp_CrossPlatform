@@ -7,6 +7,12 @@ import '../providers/calendar_state.dart';
 import '../providers/filters.dart';
 
 class DailyTitle extends StatelessWidget {
+  // remove fractional parts of double
+  String removeDecimalZeroFormat(double n) {
+    return n.toString().replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
+  }
+
+  // ************ build daily title line (month/day, num of exercises, total volume of day) ************ //
   @override
   Widget build(BuildContext context) {
     print('build dailyTitle!');
@@ -32,7 +38,7 @@ class DailyTitle extends StatelessWidget {
               Text(
                 '${events.getTodayEventsNum(today, filters)}개의 운동',
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: Colors.teal,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -40,7 +46,7 @@ class DailyTitle extends StatelessWidget {
                 width: 10,
               ),
               Text(
-                'Volume ${events.getTodayEventsVolume(today, filters)}kg',
+                'Volume ${removeDecimalZeroFormat(events.getTodayEventsVolume(today, filters))}kg',
                 style: TextStyle(
                   color: Colors.red[400],
                   fontWeight: FontWeight.w500,

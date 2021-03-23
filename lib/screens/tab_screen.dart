@@ -17,8 +17,8 @@ import '../widgets/filters_dialog.dart';
 class TabScreen extends StatelessWidget {
   final List<Map<String, Object>> _pages = [
     {'title': 'MUPPLER', 'page': HomeScreen()},
-    {'title': '', 'page': CalendarScreen()},
-    {'title': '운동/루틴 라이브러리', 'page': ManageScreen()},
+    {'title': '운동 기록', 'page': CalendarScreen()},
+    {'title': '운동 / 루틴 라이브러리', 'page': ManageScreen()},
     {'title': '다양한 기능을 사용해보세요.', 'page': FuncionsScreen()},
   ];
 
@@ -55,7 +55,8 @@ class TabScreen extends StatelessWidget {
             _pages[pageIdx.curIdx]['title'],
             style: Theme.of(context).appBarTheme.titleTextStyle.copyWith(
                 fontSize: pageIdx.curIdx == 0 ? 34 : 24,
-                color: pageIdx.curIdx == 0 ? Colors.deepOrange : Colors.white,
+                color:
+                    pageIdx.curIdx == 0 ? Colors.deepOrange[400] : Colors.white,
                 fontWeight:
                     pageIdx.curIdx == 0 ? FontWeight.w900 : FontWeight.bold),
           ),

@@ -19,15 +19,18 @@ class ExerciseList extends StatefulWidget {
   final bool isForInsert;
   final bool isForSelect;
   final bool isForRoutine;
-
+  final bool isForAddExtra;
+  final List<String> alreadySelected;
   final String selectedId;
   ExerciseList({
     this.isForManage = false,
     this.isForInsert = false,
     this.isForSelect = false,
     this.isForFilters = false,
-    this.isForRoutine = false, // 이름 더 알기쉽게. 다른것들도.
+    this.isForRoutine = false,
+    this.isForAddExtra = false,
     this.selectedId,
+    this.alreadySelected,
   });
   @override
   _ExerciseListState createState() => _ExerciseListState();
@@ -44,7 +47,7 @@ class _ExerciseListState extends State<ExerciseList> {
     _rowScrollController = ScrollController();
     _columnScrollController = ScrollController();
 
-    if (widget.isForInsert || widget.isForRoutine) {
+    if (widget.isForInsert || widget.isForRoutine || widget.isForAddExtra) {
       isSelected =
           Provider.of<Exercises>(context, listen: false).getExercisesSelection;
     }
@@ -111,6 +114,9 @@ class _ExerciseListState extends State<ExerciseList> {
       builder: (ctx, exercises, _) {
         print('build exercisesColumn!');
         final items = exercises.getExercisesByTarget(selectedTargetName);
+        if (widget.isForAddExtra) {
+          items.removeWhere((ex) => widget.alreadySelected.contains(ex.id));
+        }
         return Scrollbar(
           controller: _columnScrollController,
           child: ListView.builder(
@@ -127,7 +133,7 @@ class _ExerciseListState extends State<ExerciseList> {
   // ************ exercise tile ************ //
   Widget exerciseTile(Exercise ex, Key key) {
     // for insert Events & for make routine
-    if (widget.isForInsert || widget.isForRoutine) {
+    if (widget.isForInsert || widget.isForRoutine || widget.isForAddExtra) {
       return GestureDetector(
         key: key,
         onTap: () {
@@ -199,12 +205,6 @@ class _ExerciseListState extends State<ExerciseList> {
             softWrap: false,
             overflow: TextOverflow.ellipsis,
           ),
-          trailing: IconButton(
-              icon: Icon(
-                Icons.info_outline,
-                // color: Colors,
-              ),
-              onPressed: () {}),
         ),
       );
   }
@@ -233,7 +233,8 @@ class _ExerciseListState extends State<ExerciseList> {
     final deviceSize = MediaQuery.of(context).size;
     final themeData = Theme.of(context);
     print('build Exercise List!');
-    if (widget.isForSelect) {
+    // * At exercise dialog by edit event screen & adding extra event *//
+    if (widget.isForSelect || widget.isForAddExtra) {
       return Container(
         height: MediaQuery.of(context).size.height / 2,
         width: MediaQuery.of(context).size.width - 100,
@@ -244,7 +245,8 @@ class _ExerciseListState extends State<ExerciseList> {
             Expanded(child: exercisesListTiles),
             TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(selectedId);
+                  Navigator.of(context)
+                      .pop(widget.isForSelect ? selectedId : isSelected);
                 },
                 child: Text('선택완료'))
           ],
@@ -285,11 +287,13 @@ class _ExerciseListState extends State<ExerciseList> {
           categoriesBox,
 
           Expanded(child: exercisesListTiles),
-          Divider(),
+          Divider(
+            color: Colors.black,
+          ),
           if (widget.isForManage)
             floatingButton(
               isBadge: false,
-              text: '항목 추가하기',
+              text: '운동 추가하기',
               icon: Icons.add,
               onPressed: () => showDialog(
                 context: context,

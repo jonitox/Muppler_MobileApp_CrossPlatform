@@ -56,7 +56,7 @@ class Routines with ChangeNotifier {
                   setsPerEvent.containsKey(e['id'])
                       ? setsPerEvent[e['id']].length
                       : 0,
-                  (i) => setsPerEvent[e['id']][i]),
+                  (i) => setsPerEvent[e['id']][i]).toList(),
               type: e['type'] == 0 ? DetailType.basic : DetailType.onlyRep,
             )
           },
@@ -72,7 +72,7 @@ class Routines with ChangeNotifier {
             id: r['id'],
             name: r['name'],
             items: List.generate(eventsPerRoutine[r['id']].length,
-                (i) => eventsPerRoutine[r['id']][i]),
+                (i) => eventsPerRoutine[r['id']][i]).toList(),
           ),
         );
       },
@@ -86,7 +86,7 @@ class Routines with ChangeNotifier {
   void addRoutine(String name, List<Event> items) {
     var uuid = Uuid();
     final newRoutine = Routine(
-        id: DateTime.now().toIso8601String(),
+        id: uuid.v4(),
         name: name,
         items: items.map((e) => e.copyWith(id: uuid.v4())).toList());
     print(_items);
@@ -105,7 +105,11 @@ class Routines with ChangeNotifier {
   List<String> deleteRoutinesOfExercise(String exerciseId) {
     List<String> routineIdsOfExercise = [];
     _items.forEach((r) {
-      if (r.containExercise(exerciseId)) routineIdsOfExercise.add(r.id);
+      if (r.containExercise(exerciseId)) {
+        routineIdsOfExercise.add(r.id);
+        print('있대!!');
+        print(r.name);
+      }
     });
     _items.removeWhere((r) => r.containExercise(exerciseId));
     notifyListeners();
@@ -119,7 +123,7 @@ class Routines with ChangeNotifier {
       name: name,
       items: events.map((e) => e.copyWith(id: uuid.v4())).toList(),
     );
-    final idx = _items.indexWhere((r) => id == id);
+    final idx = _items.indexWhere((r) => r.id == id);
     _items[idx] = modifiedRoutine;
     notifyListeners();
     DBHelper.updateRoutine(id, modifiedRoutine.routineToMap(),

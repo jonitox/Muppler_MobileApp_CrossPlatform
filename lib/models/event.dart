@@ -10,6 +10,7 @@ class Event {
   final DateTime date;
   String exerciseId;
   List<Set> setDetails;
+  // List<bool> setSuccesses;
   String memo;
   DetailType type;
   Event({
@@ -51,8 +52,13 @@ class Event {
     setDetails.add(item);
   }
 
-  void removeSet() {
-    if (numOfSets > 0) setDetails.removeLast();
+  void removeSet(int idx) {
+    print('remove $idx !');
+    setDetails.removeAt(idx);
+  }
+
+  void updateSet(int idx, Set updatedSet) {
+    setDetails[idx] = updatedSet;
   }
 
   dynamic get volume {

@@ -50,6 +50,7 @@ class DisplayEvents extends StatelessWidget {
             ),
           )
         : ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: isDailyEvents || isTodayEvents ? true : false,
             itemCount: eventsToShow.length,
             itemBuilder: (ctx, i) => EventTile(
@@ -79,6 +80,11 @@ class _EventTileState extends State<EventTile> {
     isHide = true;
     exercises = Provider.of<Exercises>(context, listen: false);
     super.initState();
+  }
+
+  // remove fractional parts of double
+  String removeDecimalZeroFormat(double n) {
+    return n.toString().replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
   }
 
   // ************ title of event tile ************ //
@@ -141,7 +147,7 @@ class _EventTileState extends State<EventTile> {
                 child: Text(
                   exercise.name,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -149,7 +155,7 @@ class _EventTileState extends State<EventTile> {
         ),
         if (!widget.isTracked)
           IconButton(
-            icon: Icon(Icons.more_horiz_outlined),
+            icon: Icon(Icons.edit),
             onPressed: () => Navigator.of(context)
                 .pushNamed(EditEventScreen.routeName, arguments: widget.event),
           ),
@@ -171,7 +177,9 @@ class _EventTileState extends State<EventTile> {
               border: Border.all(width: 1, color: Colors.black26),
               borderRadius: BorderRadius.circular(10)),
           child: Text(
-            widget.event.memo.trim().length > 0 ? widget.event.memo : 'MEMO',
+            widget.event.memo.trim().length > 0
+                ? widget.event.memo
+                : 'MEMO (없음)',
             softWrap: false,
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
@@ -186,13 +194,21 @@ class _EventTileState extends State<EventTile> {
 
   // ************ event Summary ************ //
   Widget get eventSummary {
-    final vol = widget.event.volume.toString() +
-        (widget.event.type == DetailType.onlyRep ? '개' : 'kg');
+    final vol = widget.event.volume;
+    final volText =
+        (vol is double ? removeDecimalZeroFormat(vol) : vol.toString()) +
+            (vol is double ? 'kg' : '개');
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Text('총 세트 수 : ${widget.event.setDetails.length}'),
-        Text('Volume : $vol')
+        Text(
+          '총 세트 수 : ${widget.event.setDetails.length}',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+        ),
+        Text(
+          'Volume : $volText',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+        ),
       ],
     );
   }
@@ -207,7 +223,8 @@ class _EventTileState extends State<EventTile> {
               children: [
                 Text('${idx + 1}세트'),
                 if (widget.event.type == DetailType.basic)
-                  Text('${widget.event.setDetails[idx].weight}Kg'),
+                  Text(
+                      '${removeDecimalZeroFormat(widget.event.setDetails[idx].weight)}Kg'),
                 Text('${widget.event.setDetails[idx].rep}회'),
               ],
             ),

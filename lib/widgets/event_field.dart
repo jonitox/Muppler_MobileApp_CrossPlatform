@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:work_out_tracker/widgets/exercise_list.dart';
 
-import '../widgets/memo_dialog.dart';
+import './memo_dialog.dart';
+import './exercise_list.dart';
+import './set_sheet.dart';
 
 import '../providers/exercises.dart';
 import '../models/event.dart';
@@ -13,6 +14,7 @@ class EventField extends FormField<Event> {
   EventField({
     FormFieldSetter<Event> onSaved,
     FormFieldValidator<Event> validator,
+    Function deleteEvent,
     Event initialValue,
     bool isEdit,
     bool isForRoutine = false,
@@ -29,23 +31,23 @@ class EventField extends FormField<Event> {
               state,
               isEdit,
               isForRoutine,
+              deleteEvent,
             ); // named로
           },
         );
 }
 
 //// ******************************* event Field box ******************************* ////
-///
 class EventFieldBox extends StatefulWidget {
   final FormFieldState<Event> state;
   final bool isEdit;
   final bool isForRoutine;
-  // final TextEditingController weightController;
-  // final TextEditingController repController;
+  final Function deleteEvent;
   EventFieldBox(
     this.state,
     this.isEdit,
     this.isForRoutine,
+    this.deleteEvent,
   );
 
   @override
@@ -57,13 +59,19 @@ class _EventFieldBoxState extends State<EventFieldBox> {
   Event event;
   Exercises exercises;
   Exercise exercise;
-  double weight = 1115;
-  int repetition = 6;
+  double weightToInsert;
+  int repToInsert;
+  List<int> weightPlaceHolder;
+  List<int> repPlaceHolder;
 
   @override
   void initState() {
+    event = widget.state.value;
+    weightToInsert =
+        event.setDetails.length == 0 ? 0.0 : event.setDetails.last.weight;
+    repToInsert = event.setDetails.length == 0 ? 0 : event.setDetails.last.rep;
     exercises = Provider.of<Exercises>(context, listen: false);
-    isHide = false;
+    isHide = widget.isEdit ? false : true;
     print('init event field!');
 
     super.initState();
@@ -75,8 +83,18 @@ class _EventFieldBoxState extends State<EventFieldBox> {
     super.dispose();
   }
 
+  // remove fractional parts of double
   String removeDecimalZeroFormat(double n) {
     return n.toString().replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
+  }
+
+  // update Set PlaceHolder
+  void updateSetPlaceHolder(bool isRepVal, int digit, int val) {
+    if (isRepVal) {
+      repPlaceHolder[digit] = val;
+    } else {
+      weightPlaceHolder[digit] = val;
+    }
   }
 
   // ************ on Tap memo Box ************ //
@@ -96,9 +114,61 @@ class _EventFieldBoxState extends State<EventFieldBox> {
     widget.state.didChange(event.copyWith(memo: memo));
   }
 
-  void onTapSetRow({double w, int r, bool isNew, int setNumber}) async {
-    // await showModalBottomSheet(context: context, builder: builder);
-    print('tap!');
+  // ************ on Tap Change set row ************ //
+  Future<void> onTapSetRow({int setNumber}) async {
+    final originWeight = setNumber == 0
+        ? weightToInsert
+        : event.setDetails[setNumber - 1].weight;
+    final originRep =
+        setNumber == 0 ? repToInsert : event.setDetails[setNumber - 1].rep;
+    weightPlaceHolder = List.generate(4, (i) {
+      final int rounded = (originWeight * 10).round();
+      if (i == 0) {
+        return rounded ~/ 1000;
+      } else if (i == 1) {
+        return rounded ~/ 100 % 10;
+      } else if (i == 2) {
+        return rounded ~/ 10 % 10;
+      } else {
+        return rounded % 10;
+      }
+    }).toList();
+    repPlaceHolder = List.generate(3, (i) {
+      if (i == 0) {
+        return originRep ~/ 100;
+      } else if (i == 1) {
+        return originRep ~/ 10 % 10;
+      } else {
+        return originRep % 10;
+      }
+    }).toList();
+
+    await showModalBottomSheet(
+        isScrollControlled: false,
+        enableDrag: false,
+        context: context,
+        builder: (ctx) => SetSheet(
+              weightHolder: weightPlaceHolder,
+              repHolder: repPlaceHolder,
+              setNumber: setNumber,
+              isOnlyRep: event.type == DetailType.onlyRep,
+              updateSetInfoHolders: updateSetPlaceHolder,
+            ));
+
+    final updatedWeight = event.type == DetailType.onlyRep
+        ? 0.0
+        : weightPlaceHolder.fold(0, (sum, x) => (10 * sum + x)) / 10;
+    final updatedRep = repPlaceHolder.fold(0, (sum, x) => (10 * sum + x));
+
+    if (setNumber == 0) {
+      setState(() {
+        weightToInsert = updatedWeight;
+        repToInsert = updatedRep;
+      });
+    } else {
+      event.updateSet(setNumber - 1, Set(updatedWeight, updatedRep));
+      widget.state.didChange(event);
+    }
   }
 
   // ************ on Tap Change Exercise when editing event ************ //
@@ -115,10 +185,10 @@ class _EventFieldBoxState extends State<EventFieldBox> {
     if (exerciseId == null) {
       return;
     }
-    // event.exerciseId = exerciseId;
-    print(exerciseId);
     widget.state.didChange(event.copyWith(exerciseId: exerciseId));
   }
+
+/////////////////////////////// widgets builders //////////////////////////////////////////
 
   // ************ title Row ************ //
   Widget get titleRow {
@@ -156,7 +226,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
           label: Text(
             exercise.target.value,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Colors.teal),
+            // style: TextStyle(color: Colors.teal),
           ),
         ),
         SizedBox(
@@ -168,32 +238,55 @@ class _EventFieldBoxState extends State<EventFieldBox> {
             maxLines: 1,
             softWrap: false,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
           ),
         ),
         if (widget.isEdit)
-          TextButton(child: Text('변경'), onPressed: () => onTapChangeExercise()),
+          ElevatedButton(
+              child: Text('종목 변경'), onPressed: () => onTapChangeExercise()),
+        if (!widget.isEdit)
+          Container(
+            child: FittedBox(
+              fit: BoxFit.fitWidth,
+              child: IconButton(
+                iconSize: 23,
+                icon: Icon(
+                  Icons.delete_outline_outlined,
+                  color: Colors.deepOrange,
+                ),
+                onPressed: () => widget.deleteEvent(event.exerciseId),
+              ),
+            ),
+          ),
       ],
     );
   }
 
 // ************ event summary row ************ //
   Widget get summaryRow {
-    final vol = event.volume is double
-        ? removeDecimalZeroFormat(event.volume)
-        : event.volume.toString() +
-            (event.type == DetailType.onlyRep ? '개' : 'kg');
+    final vol = (event.volume is double
+                ? removeDecimalZeroFormat(event.volume)
+                : event.volume.toString())
+            .toString() +
+        (event.type == DetailType.onlyRep ? '개' : 'kg');
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Text('총 세트 수 : ${event.setDetails.length}'),
-        Text('Volume : $vol')
+        Text(
+          '총 세트 수 : ${event.setDetails.length}',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+        Text(
+          'Volume : $vol',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        )
       ],
     );
   }
 
 // ************ hidden box ************ //
   Widget get hiddenBox {
+    final deviceSize = MediaQuery.of(context).size;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -202,9 +295,12 @@ class _EventFieldBoxState extends State<EventFieldBox> {
           thickness: 1.5,
         ),
         if (!widget.isForRoutine) memoBox,
-        insertSetRow,
-        insertButtonRow,
-        ...setDetailsColumn,
+        insertSetRow(deviceSize),
+        Divider(
+          thickness: 1.5,
+        ),
+        // insertButtonRow,
+        setDetailsColumn(deviceSize),
       ],
     );
   }
@@ -239,15 +335,53 @@ class _EventFieldBoxState extends State<EventFieldBox> {
   }
 
   // ************ insert set row ************ //
-  Widget get insertSetRow {
+  Widget insertSetRow(Size deviceSize) {
+    final themeData = Theme.of(context);
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Text('세트 :'),
+        Container(
+          margin: const EdgeInsets.only(left: 5),
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+              border: Border.all(width: 1, color: themeData.accentColor),
+              borderRadius: BorderRadius.circular(10)),
+          child: PopupMenuButton(
+            // color: themeData.accentColor,
+            child: event.type == DetailType.basic
+                ? Text('무게, 횟수', style: TextStyle(color: themeData.accentColor))
+                : Text('횟수', style: TextStyle(color: themeData.accentColor)),
+            itemBuilder: (ctx) => [
+              PopupMenuItem(
+                child: Text(
+                  '무게, 횟수',
+                  style: TextStyle(color: themeData.accentColor),
+                  softWrap: true,
+                ),
+                value: 0,
+              ),
+              PopupMenuItem(
+                child: Text(
+                  '횟수',
+                  style: TextStyle(color: themeData.accentColor),
+                  softWrap: true,
+                ),
+                value: 1,
+              ),
+            ],
+            onSelected: (value) {
+              // event.type = value == 0 ? DetailType.basic : DetailType.onlyRep;
+              print(value);
+              widget.state.didChange(event.copyWith(
+                  type: value == 0 ? DetailType.basic : DetailType.onlyRep));
+            },
+          ),
+        ),
         Expanded(
           child: GestureDetector(
-            onTap: onTapSetRow,
+            onTap: () => onTapSetRow(setNumber: 0),
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
+              margin: const EdgeInsets.symmetric(horizontal: 10),
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 border: Border.all(width: 1, color: Colors.deepOrange),
@@ -260,19 +394,17 @@ class _EventFieldBoxState extends State<EventFieldBox> {
                     Row(
                       children: [
                         Text(
-                          '${removeDecimalZeroFormat(weight)}',
+                          '${removeDecimalZeroFormat(weightToInsert)}',
                           style: TextStyle(
                             fontSize: 22,
                             // decoration: TextDecoration.underline,
                             // decorationColor: Colors.bl,
-                            fontStyle: FontStyle.italic,
                           ),
                         ),
                         Text(
                           'kg',
                           style: TextStyle(
                             fontSize: 22,
-                            fontStyle: FontStyle.italic,
                             color: Colors.teal,
                           ),
                         ),
@@ -281,12 +413,11 @@ class _EventFieldBoxState extends State<EventFieldBox> {
                   Row(
                     children: [
                       Text(
-                        '$repetition',
+                        '$repToInsert',
                         style: TextStyle(
                           fontSize: 22,
 
                           // decoration: TextDecoration.underline,
-                          fontStyle: FontStyle.italic,
                           // decorationColor: Colors.teal,
                         ),
                       ),
@@ -294,7 +425,6 @@ class _EventFieldBoxState extends State<EventFieldBox> {
                         '회',
                         style: TextStyle(
                           fontSize: 22,
-                          fontStyle: FontStyle.italic,
                           color: Colors.teal,
                         ),
                       ),
@@ -305,107 +435,120 @@ class _EventFieldBoxState extends State<EventFieldBox> {
             ),
           ),
         ),
-        // if (event.type == DetailType.basic)
-        //   Expanded(
-        //     child: TextField(
-        //       decoration: InputDecoration(labelText: '무게'),
-        //       controller: widget.weightController,
-        //       keyboardType: TextInputType.number,
-        //       textInputAction: TextInputAction.done,
-        //     ),
-        //   ),
-        // if (event.type == DetailType.basic) Text('Kg'),
-        // Expanded(
-        //   child: TextField(
-        //     decoration: InputDecoration(labelText: '반복수'),
-        //     controller: widget.repController,
-        //     keyboardType: TextInputType.number,
-        //     textInputAction: TextInputAction.done,
-        //   ),
-        // ),
-        // Text('회'),
-        PopupMenuButton(
-          child: event.type == DetailType.basic ? Text('무게,개수') : Text('개수만'),
-          itemBuilder: (ctx) => [
-            PopupMenuItem(
-              child: Text('무게,개수'),
-              value: 0,
-            ),
-            PopupMenuItem(
-              child: Text('개수만'),
-              value: 1,
-            ),
-          ],
-          onSelected: (value) {
-            // event.type = value == 0 ? DetailType.basic : DetailType.onlyRep;
-            print(value);
-            widget.state.didChange(event.copyWith(
-                type: value == 0 ? DetailType.basic : DetailType.onlyRep));
-          },
-        )
-      ],
-    );
-  }
-
-  // ************ insert set button ************ //
-  Widget get insertButtonRow {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        ElevatedButton(
-          onPressed: () {
-            // event.addSet(Set(
-            //     // double.parse(widget.weightController.text),
-            //     // int.parse(widget.repController.text),
-            //     ));
-            widget.state.didChange(event); // memoy leak?
-          },
-          child: Text('세트 추가'),
-        ),
-        if (event.setDetails.length > 0)
-          ElevatedButton(
-            onPressed: () {
-              // event.deleteset
-              // widget.state.didChange(event); // memoy leak?
-            },
-            child: Text('세트 삭제'),
+        Container(
+          margin: const EdgeInsets.only(
+            right: 5,
           ),
+          child: FittedBox(
+            child: ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                  (_) => themeData.accentColor,
+                ),
+                minimumSize: MaterialStateProperty.resolveWith<Size>(
+                    (_) => Size(deviceSize.width * 0.15, 40)),
+              ),
+              onPressed: () {
+                event.addSet(Set(
+                  weightToInsert,
+                  repToInsert,
+                ));
+                widget.state.didChange(event); // memoy leak?
+              },
+              child: Text('세트 추가'),
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  List<Widget> get setDetailsColumn {
-    // listview로? shrinkwrap =true;
-    return event.setDetails.asMap().entries.map((entry) {
-      final idx = entry.key;
-      final s = entry.value;
-      return GestureDetector(
-        onTap: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (ctx) => modifySetBottomSheet,
-          );
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text('${idx + 1}세트'),
-            if (event.type == DetailType.basic) Text('${s.weight}Kg'),
-            Text('${s.rep}회'),
-          ],
-        ),
-      );
-    }).toList();
-  }
-
-  Widget get modifySetBottomSheet {
-    return SingleChildScrollView(
-      child: Container(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Row(
-          children: [],
-        ),
+  // ************ set details column  ************ //
+  Widget setDetailsColumn(Size deviceSize) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemExtent: 35,
+      itemCount: event.setDetails.length,
+      itemBuilder: (ctx, i) => Row(
+        key: ValueKey('set#$i'),
+        children: [
+          // *미추가: 세트 성공 여부 기능
+          // Container(
+          //   width: deviceSize.width * 0.1,
+          //   child: FittedBox(
+          //     fit: BoxFit.fitWidth,
+          //     child: OutlinedButton(
+          //       onPressed: () {},
+          //       child: Text('완료'),
+          //     ),
+          //   ),
+          // ),
+          Container(
+            // color: Colors.red,
+            width: deviceSize.width * 0.2,
+            child: Center(
+                child: Text(
+              '${i + 1}세트',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            )),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => onTapSetRow(setNumber: i + 1),
+              child: Container(
+                margin: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 1, color: Colors.grey),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    if (event.type == DetailType.basic)
+                      Container(
+                        width: deviceSize.width * 0.2,
+                        child: Center(
+                            child: Text(
+                          '${removeDecimalZeroFormat(event.setDetails[i].weight)}Kg',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 15,
+                          ),
+                        )),
+                      ),
+                    Container(
+                      // color: Colors.red,
+                      width: deviceSize.width * 0.2,
+                      child: Center(
+                          child: Text(
+                        '${event.setDetails[i].rep}회',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15,
+                        ),
+                      )),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Container(
+            // color: Colors.blue,
+            width: deviceSize.width * 0.07,
+            child: FittedBox(
+              fit: BoxFit.fitWidth,
+              child: IconButton(
+                iconSize: 28,
+                icon: Icon(Icons.delete_outline_outlined),
+                onPressed: () {
+                  event.removeSet(i);
+                  widget.state.didChange(event);
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -414,11 +557,10 @@ class _EventFieldBoxState extends State<EventFieldBox> {
   Widget build(BuildContext context) {
     event = widget.state.value;
     exercise = exercises.getExercise(event.exerciseId);
+
     print('build event field box!');
-    print(event.date.toString());
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      // builder등으로 분리해서 정리.
       children: [
         titleRow,
         Divider(

@@ -42,18 +42,36 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
       String id = exercises.addExercise(name, Target(selectedTargetName));
       filters.addFilter(id);
     } else {
-      print(widget.id);
       exercises.updateExercise(
           widget.id, Exercise(widget.id, name, Target(selectedTargetName)));
     }
   }
 
-  void _onDelete() {
-    // 삭제 확인 dialog추가? 꼭있어야함. 위험하니까. // 밑에 알림바로 알림?
+  Future<void> _onDelete() async {
+    final isSure = await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              content: Text(
+                '운동을 삭제하시겠습니까?\n해당 운동의 기록 및 운동을 포함하는 루틴이 모두 삭제됩니다.',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text('아니오')),
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: Text('예')),
+              ],
+            ));
+    if (!isSure) {
+      return;
+    }
     final eventIds = Provider.of<Events>(context, listen: false)
         .deleteEventsOfExercise(widget.id);
     final routineIds = Provider.of<Routines>(context, listen: false)
         .deleteRoutinesOfExercise(widget.id);
+    print(routineIds.length);
     exercises.deleteExercise(widget.id, eventIds, routineIds);
     filters.deleteFilter(widget.id);
     Navigator.of(context).pop();
@@ -120,7 +138,7 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
                         Navigator.of(context).pop();
                       }
                     },
-                    child: Text('저장'),
+                    child: Text('추가'),
                   ),
                   if (!widget.isInsert)
                     ElevatedButton(

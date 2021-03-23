@@ -6,6 +6,7 @@ import '../models/event.dart';
 import '../providers/events.dart';
 
 import '../widgets/event_field.dart';
+import '../widgets/custom_floating_button.dart';
 
 class EditEventScreen extends StatefulWidget {
   static const routeName = '/edit_event_screen';
@@ -19,8 +20,6 @@ class _EditEventScreenState extends State<EditEventScreen> {
   Events events;
   bool isInit = true;
   final _key = GlobalKey<FormState>();
-  final weightController = TextEditingController(); // initState에서 생성해야되나?
-  final repController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -35,20 +34,77 @@ class _EditEventScreenState extends State<EditEventScreen> {
   @override
   void dispose() {
     print('dispose edit event screen!');
-    weightController.dispose();
-    repController.dispose();
     super.dispose();
   }
 
+  // ************ complete edition ************ //
   void onCompleteEdit() {
     _key.currentState.save();
     Navigator.of(context).pop();
   }
 
-  void onDeleteEvent() {
-    print(event.exerciseId);
+  // ************  delete event ************ //
+  Future<void> onDeleteEvent() async {
+    final completeEvents = await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              content: Text(
+                '기록을 삭제하시겠습니까?',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text('아니오')),
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: Text('예')),
+              ],
+            ));
+    if (!completeEvents) {
+      return;
+    }
     events.deleteEvent(event.id);
     Navigator.of(context).pop();
+  }
+
+  // ************ event tile to edit ************ //
+  Widget get eventInfo {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
+          child: EventField(
+            initialValue: event.copyWith(id: '_'),
+            isEdit: true,
+            onSaved: (ev) {
+              events.updateEvent(event.id, ev.copyWith(id: event.id));
+            },
+            validator: (ev) => null,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ************ job complete buttons ************ //
+  Widget get jobCompleteRow {
+    print('create jobcomplete row!');
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CustomFloatingButton(
+          name: '수정완료',
+          onPressed: onCompleteEdit,
+          color: Colors.teal,
+        ),
+        CustomFloatingButton(
+          name: '기록삭제',
+          onPressed: onDeleteEvent,
+          color: Colors.teal,
+        ),
+      ],
+    );
   }
 
   @override
@@ -56,34 +112,20 @@ class _EditEventScreenState extends State<EditEventScreen> {
     print('build edit event screen!');
 
     return Scaffold(
-      appBar: AppBar(),
-      body: Form(
-        key: _key,
-        child: SingleChildScrollView(
+      appBar: AppBar(
+        leading: Container(),
+        title: Text('기록을 수정하세요.'),
+      ),
+      body: SafeArea(
+        child: Form(
+          key: _key,
           child: Column(
             children: [
-              EventField(
-                initialValue: event.copyWith(id: '_'),
-                isEdit: true,
-                onSaved: (ev) {
-                  events.updateEvent(event.id, ev.copyWith(id: event.id));
-                },
-                validator: (ev) => null,
-                // weightController: weightController,
-                // repController: repController,
+              eventInfo,
+              Divider(
+                color: Colors.black,
               ),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: onCompleteEdit,
-                    child: Text('수정 완료'),
-                  ),
-                  ElevatedButton(
-                    onPressed: onDeleteEvent,
-                    child: Text('기록 삭제'),
-                  ),
-                ],
-              )
+              jobCompleteRow,
             ],
           ),
         ),

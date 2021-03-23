@@ -9,6 +9,7 @@ class CustomFloatingButton extends StatelessWidget {
   CustomFloatingButton(
       {this.name, this.icon, this.onPressed, this.color = Colors.deepOrange});
 
+  // ************ custom floatting button with outline ************ //
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
