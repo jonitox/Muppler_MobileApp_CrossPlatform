@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:work_out_tracker/providers/tap_page_index.dart';
 import 'package:work_out_tracker/screens/timer_screen.dart';
 
-import '../providers/selectedExercise.dart';
 import '../providers/exercises.dart';
 import './tracking_screen.dart';
 import '../models/exercise.dart';
@@ -24,7 +23,7 @@ class FuncionsScreen extends StatelessWidget {
   //   TimerScreen(),
   // ];
 
-  Widget trackingBox(TapPageIndex pageState) {
+  Widget trackingBox(BuildContext ctx) {
     return Column(
       children: [
         Text('운동별 성장을 한 눈에 확인해보세요.'),
@@ -32,14 +31,14 @@ class FuncionsScreen extends StatelessWidget {
           label: Text('운동별 기록'),
           icon: Icon(Icons.hourglass_bottom),
           onPressed: () {
-            pageState.moveFuncPage(1);
+            Navigator.of(ctx).pushNamed(TrackingScreen.routeName);
           },
         ),
       ],
     );
   }
 
-  Widget timerBox(TapPageIndex pageState) {
+  Widget timerBox(BuildContext ctx) {
     return Column(
       children: [
         Text('운동 시 휴식시간을 확인하세요.'),
@@ -47,7 +46,7 @@ class FuncionsScreen extends StatelessWidget {
           label: Text('스탑워치'),
           icon: Icon(Icons.timer),
           onPressed: () {
-            pageState.moveFuncPage(2);
+            Navigator.of(ctx).pushNamed(TimerScreen.routeName);
           },
         ),
       ],
@@ -56,24 +55,17 @@ class FuncionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pageState = Provider.of<TapPageIndex>(context);
-    if (pageState.funcPageIdx == 0) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          trackingBox(pageState),
-          Divider(
-            height: 20,
-            thickness: 0.8,
-            color: Theme.of(context).primaryColor, // theme
-          ),
-          timerBox(pageState),
-        ],
-      );
-    } else if (pageState.funcPageIdx == 1) {
-      return TrackingScreen();
-    } else {
-      return TimerScreen();
-    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        trackingBox(context),
+        Divider(
+          height: 20,
+          thickness: 0.8,
+          color: Theme.of(context).primaryColor, // theme
+        ),
+        timerBox(context),
+      ],
+    );
   }
 }

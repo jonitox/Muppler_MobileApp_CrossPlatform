@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
+import 'package:work_out_tracker/providers/lap_times.dart';
 
 import './screens/timer_screen.dart';
 import './screens/tracking_screen.dart';
@@ -14,7 +15,6 @@ import './providers/filters.dart';
 import './providers/events.dart';
 import './providers/exercises.dart';
 import './providers/calendar_state.dart';
-import './providers/selectedExercise.dart';
 import './providers/routines.dart';
 import 'providers/stopwatch_state.dart';
 
@@ -50,7 +50,10 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (ctx) => StopWatchState(),
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => LapTimes(),
+        ),
       ],
       builder: (ctx, _) => MaterialApp(
         title: 'WorkOut_Tracker',
@@ -71,6 +74,7 @@ class MyApp extends StatelessWidget {
           textTheme: ThemeData.light().textTheme.copyWith(
                 button: TextStyle(color: Colors.red),
                 // headline6: TextStyle(color: Colors.deepOrange[700]),
+                headline3: TextStyle(color: Colors.black),
                 headline4: TextStyle(color: Colors.red),
               ),
         ),

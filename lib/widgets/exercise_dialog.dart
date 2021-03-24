@@ -163,7 +163,7 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
       title: Column(
         children: [
           Text(
-            widget.isInsert ? '새로운 운동 추가' : '운동의 정보',
+            widget.isInsert ? '새로운 운동 추가' : '운동 정보 수정',
             style: TextStyle(fontSize: 23, fontWeight: FontWeight.w500),
           ),
           Divider(

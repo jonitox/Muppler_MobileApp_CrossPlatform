@@ -3,48 +3,169 @@ import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/stopwatch_state.dart';
+import '../providers/lap_times.dart';
 
 class TimerScreen extends StatelessWidget {
   static const routeName = 'timer_screen';
 
-  Widget resetAndRecordButton(StopWatchState stopwatch) {
-    return FloatingActionButton(
-        backgroundColor: stopwatch.isOn ? Colors.blue : Colors.grey,
-        heroTag: 'btn1',
-        onPressed: stopwatch.isOn
-            ? () {
-                if (stopwatch.isRunning) {
-                  stopwatch.addLap();
-                } else {
-                  stopwatch.reset();
-                }
-              }
-            : null,
-        child: Text(stopwatch.isRunning ? '랩타임' : '초기화'));
+  // ************ on add overlay  ************ //
+  void swtichToOverlay(BuildContext ctx) {
+    final deviceSize = MediaQuery.of(ctx).size;
+    final themeData = Theme.of(ctx);
+    final laptimes = Provider.of<LapTimes>(ctx, listen: false);
+    OverlayEntry timerColumnForOverlay;
+    timerColumnForOverlay = OverlayEntry(
+      builder: (bctx) => Positioned(
+        bottom: deviceSize.height * 0.15,
+        right: 5,
+        child: Consumer<StopWatchState>(
+          builder: (bctx, stopwatch, _) {
+            return Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(width: 1, color: Colors.grey)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  timeBox(deviceSize.width, stopwatch, themeData),
+                  startAndPauseButton(stopwatch),
+                  SizedBox(
+                    height: 3,
+                  ),
+                  resetAndShutOverlayButton(
+                      laptimes, stopwatch, timerColumnForOverlay),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+    Overlay.of(ctx).insert(timerColumnForOverlay);
   }
 
+// ************ time Box  ************ //
+  Widget timeBox(
+      double deviceWidth, StopWatchState stopwatch, ThemeData themeData) {
+    final timeSegs = stopwatch.getTime;
+    return Container(
+      margin: EdgeInsets.symmetric(
+          vertical: stopwatch.isOnOverlay ? 5 : 50,
+          horizontal: stopwatch.isOnOverlay ? 2 : 0),
+      width: stopwatch.isOnOverlay ? deviceWidth * 0.15 : deviceWidth * 0.8,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
+            fit: FlexFit.tight,
+            flex: 2,
+            child: Center(
+              child: Text(
+                timeSegs['min'],
+                style: themeData.textTheme.headline3
+                    .copyWith(fontSize: stopwatch.isOnOverlay ? 18 : 50),
+              ),
+            ),
+          ),
+          Flexible(
+            fit: FlexFit.tight,
+            flex: 1,
+            child: Center(
+              child: Text(
+                ':',
+                style: themeData.textTheme.headline3
+                    .copyWith(fontSize: stopwatch.isOnOverlay ? 18 : 50),
+              ),
+            ),
+          ),
+          Flexible(
+            fit: FlexFit.tight,
+            flex: 2,
+            child: Center(
+              child: Text(
+                timeSegs['sec'],
+                style: themeData.textTheme.headline3
+                    .copyWith(fontSize: stopwatch.isOnOverlay ? 18 : 50),
+              ),
+            ),
+          ),
+          if (!stopwatch.isOnOverlay)
+            Flexible(
+              fit: FlexFit.tight,
+              flex: 1,
+              child: Center(
+                child: Text(
+                  '.',
+                  style: themeData.textTheme.headline3.copyWith(fontSize: 50),
+                ),
+              ),
+            ),
+          if (!stopwatch.isOnOverlay)
+            Flexible(
+              fit: FlexFit.tight,
+              flex: 2,
+              child: Center(
+                child: Text(
+                  timeSegs['msec'],
+                  style: themeData.textTheme.headline3.copyWith(fontSize: 50),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // ************  reset/addLap button ************ //
+  Widget resetAndRecordButton(StopWatchState stopwatch) {
+    return Consumer<LapTimes>(
+      builder: (ctx, laptimes, _) => FloatingActionButton(
+          backgroundColor: stopwatch.isOn
+              ? (stopwatch.isRunning ? Colors.lime[900] : Colors.red[400])
+              : Colors.grey,
+          heroTag: 'btn1',
+          onPressed: stopwatch.isOn
+              ? () {
+                  if (stopwatch.isRunning) {
+                    laptimes.addLap(stopwatch.getTime);
+                  } else {
+                    laptimes.clearLaps();
+                    stopwatch.reset();
+                  }
+                }
+              : null,
+          child: Text(stopwatch.isRunning ? '랩타임' : '초기화')),
+    );
+  }
+
+  // ************  reset/shutdownOverlay button ************ //
   Widget resetAndShutOverlayButton(
-      StopWatchState stopwatch, OverlayEntry entry) {
+      LapTimes lapTimes, StopWatchState stopwatch, OverlayEntry entry) {
     return FloatingActionButton(
         backgroundColor: stopwatch.isRunning
             ? Colors.grey
-            : (stopwatch.isOn ? Colors.blue : Colors.teal),
-        heroTag: 'btn4',
+            : (stopwatch.isOn ? Colors.red[300] : Colors.teal),
+        heroTag: 'btn3',
         onPressed: stopwatch.isRunning
             ? null
             : () {
                 if (stopwatch.isOn) {
+                  lapTimes.clearLaps();
                   stopwatch.reset();
                 } else {
-                  entry.remove();
                   stopwatch.switchOverlay();
+                  entry.remove();
                 }
               },
-        child: FittedBox(child: Text(stopwatch.isOn ? '초기화' : '타이머 종료')));
+        child: FittedBox(child: Text(stopwatch.isOn ? '초기화' : '종료')));
   }
 
+  // ************ start/pause button ************ //
   Widget startAndPauseButton(StopWatchState stopwatch) {
     return FloatingActionButton(
+        backgroundColor: stopwatch.isRunning ? Colors.orange : Colors.blue[400],
         heroTag: 'btn2',
         onPressed: () {
           if (stopwatch.isRunning) {
@@ -56,80 +177,155 @@ class TimerScreen extends StatelessWidget {
         child: Text(stopwatch.isRunning ? '중단' : '시작'));
   }
 
-  void swtichToOverlay(BuildContext ctx) {
-    OverlayEntry timerColumnForOverlay;
-    timerColumnForOverlay = OverlayEntry(
-      builder: (bctx) => Positioned(
-        bottom: 50,
-        child: Consumer<StopWatchState>(
-          builder: (bctx, stopwatch, _) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                resetAndShutOverlayButton(stopwatch, timerColumnForOverlay),
-                startAndPauseButton(stopwatch),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-    Overlay.of(ctx).insert(timerColumnForOverlay);
-  }
-
-  Widget timeBox(StopWatchState stopwatch) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text('${stopwatch.getTime}')
-        // Text('${stopwatch.seconds ~/ 6000}'.padLeft(2, '0') +
-        //     ':' +
-        //     '${(stopwatch.seconds ~/ 100) % 60}'.padLeft(2, '0') +
-        //     ':' +
-        //     '${stopwatch.seconds % 100}'.padLeft(2, '0')),
-      ],
+  // ************  separate to overlay button ************ //
+  Widget separateToOverlayButton(BuildContext ctx, StopWatchState stopwatch) {
+    return FloatingActionButton(
+      heroTag: 'btn0',
+      backgroundColor: Colors.teal,
+      onPressed: () {
+        stopwatch.switchOverlay();
+        swtichToOverlay(ctx);
+      },
+      child: Text('분리'),
     );
   }
 
-  Widget lapTimeRows(StopWatchState stopwatch) {
-    return Expanded(
-      child: ListView.builder(
-        itemCount: stopwatch.laptimes.length,
-        itemBuilder: (ctx, i) => Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text("랩${stopwatch.laptimes.length - i}"),
-            Text(stopwatch.laptimes[i]),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget timerBody(ctx) {
-    final stopwatch = Provider.of<StopWatchState>(ctx);
+  // ************  default stop watch box, that is not on overlay ************ //
+  Widget defaultTimerBox(BuildContext ctx, StopWatchState stopwatch,
+      double deviceWidth, ThemeData themeData) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        timeBox(stopwatch),
+        timeBox(deviceWidth, stopwatch, themeData),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             resetAndRecordButton(stopwatch),
             startAndPauseButton(stopwatch),
-            FloatingActionButton(
-                heroTag: 'btn3',
-                onPressed: () => swtichToOverlay(ctx),
-                child: Text('무야호')),
+            separateToOverlayButton(ctx, stopwatch),
           ],
         ),
-        lapTimeRows(stopwatch),
+        Divider(
+          height: 80,
+          thickness: 2,
+        ),
       ],
+    );
+  }
+
+  // ************  lap times records ************ //
+  Widget lapTimeRows(double deviceWidth) {
+    return Consumer<LapTimes>(
+      builder: (ctx, laptimes, _) {
+        final itemCnt = laptimes.length();
+        final items = laptimes.items;
+        return Expanded(
+          child: ListView.separated(
+            itemCount: itemCnt,
+            separatorBuilder: (ctx, i) => Divider(),
+            itemBuilder: (ctx, i) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              key: ValueKey('랩#$i'),
+              children: [
+                Container(
+                  width: deviceWidth * 0.3,
+                  child: Text(
+                    '랩${itemCnt - i}',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+                Container(
+                  width: deviceWidth * 0.4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        fit: FlexFit.tight,
+                        flex: 2,
+                        child: Center(
+                          child: Text(
+                            items[i]['min'],
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        fit: FlexFit.tight,
+                        flex: 1,
+                        child: Center(
+                          child: Text(
+                            ':',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        fit: FlexFit.tight,
+                        flex: 2,
+                        child: Center(
+                          child: Text(
+                            items[i]['sec'],
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        fit: FlexFit.tight,
+                        flex: 1,
+                        child: Center(
+                          child: Text(
+                            '.',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        fit: FlexFit.tight,
+                        flex: 2,
+                        child: Center(
+                          child: Text(
+                            items[i]['msec'],
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    print('hey');
-    return timerBody(context);
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final themeData = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('스탑워치'),
+      ),
+      body: Consumer<StopWatchState>(
+        builder: (ctx, stopwatch, ch) => stopwatch.isOnOverlay
+            ? Center(
+                child: Text(
+                  '이제 타이머를 다른 화면에서 사용할수 있습니다!',
+                  style: TextStyle(fontSize: 15),
+                ),
+              )
+            : Column(
+                children: [
+                  if (!stopwatch.isOnOverlay)
+                    defaultTimerBox(context, stopwatch, deviceWidth, themeData),
+                  ch,
+                ],
+              ),
+        child: lapTimeRows(deviceWidth),
+      ),
+    );
   }
 }

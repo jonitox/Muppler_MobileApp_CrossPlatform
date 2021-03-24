@@ -76,12 +76,17 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        nameBox,
-        functionRow,
-        eventsColumn,
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('성장기록을 확인하세요.'),
+      ),
+      body: Column(
+        children: [
+          nameBox,
+          functionRow,
+          eventsColumn,
+        ],
+      ),
     );
   }
 }

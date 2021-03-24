@@ -37,19 +37,6 @@ class TabScreen extends StatelessWidget {
     print('build tapScreen!');
     return Scaffold(
       appBar: AppBar(
-        leading: Consumer<TapPageIndex>(
-          builder: (ctx, pageIdx, _) {
-            if (pageIdx.curIdx == 3 && pageIdx.funcPageIdx > 0) {
-              return IconButton(
-                  icon: Icon(Icons.keyboard_arrow_left_rounded),
-                  onPressed: () {
-                    pageIdx.moveFuncPage(0);
-                  });
-            } else {
-              return Container();
-            }
-          },
-        ),
         title: Consumer<TapPageIndex>(
           builder: (ctx, pageIdx, _) => Text(
             _pages[pageIdx.curIdx]['title'],
