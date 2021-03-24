@@ -5,12 +5,13 @@ import 'package:flutter/foundation.dart';
 class StopWatchState with ChangeNotifier {
   bool _isRunning = false;
   Timer _timer;
+  bool _isOnOverlay = false;
   Stopwatch st = Stopwatch();
-
   List<String> _laptimes = [];
 
   bool get isRunning => _isRunning;
   bool get isOn => st.elapsed.compareTo(Duration.zero) > 0;
+  bool get isOnOverlay => _isOnOverlay;
 
   List<String> get laptimes => [..._laptimes];
 
@@ -18,6 +19,10 @@ class StopWatchState with ChangeNotifier {
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+
+  void switchOverlay() {
+    _isOnOverlay = !_isOnOverlay;
   }
 
   void start() async {
