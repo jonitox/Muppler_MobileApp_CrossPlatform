@@ -20,15 +20,18 @@ class DBHelper {
         'CREATE TABLE routineEvents (id TEXT PRIMARY KEY, routineId TEXT, orderNumber INTEGER, exerciseId TEXT, type INTEGER)'; // orderNumber,
     const _createRoutineSetsTable =
         'CREATE TABLE routineSets (id INTEGER PRIMARY KEY, routineId TEXT, eventId TEXT, setNumber INTEGER, weight REAL, repetition INTEGER)'; // setNumber안씀?
-    const _createDayMemosTable =
-        'CREATE TABLE memos (date TEXT PRIMARY KEY, dayMemo TEXT)';
+    const _createDaySatisfaction =
+        'CREATE TABLE satisfaction (date TEXT PRIMARY KEY, figure INTEGER)';
+    // const _createDayMemosTable =
+    //     'CREATE TABLE memos (date TEXT PRIMARY KEY, dayMemo TEXT)';
     await db.execute(_createEventsTable);
     await db.execute(_createSetsTable);
     await db.execute(_createExercisesTable);
     await db.execute(_createRoutinesTable);
     await db.execute(_createRoutineEventsTable);
     await db.execute(_createRoutineSetsTable);
-    await db.execute(_createDayMemosTable);
+    await db.execute(_createDaySatisfaction);
+    // await db.execute(_createDayMemosTable);
 
     // 기본 제공 운동들 입력하기.
   }
@@ -203,6 +206,7 @@ class DBHelper {
     });
   }
 
+  // updateRoutine
   static Future<void> updateRoutine(
     String routineId,
     Map<String, Object> routineData,
@@ -226,5 +230,25 @@ class DBHelper {
       });
       await batch.commit();
     });
+  }
+
+  // insert / update Satisfaction
+  static Future<void> insertOrUpdateSatisfaction(
+    String date,
+    Map<String, Object> satisfactionData,
+  ) async {
+    final db = await DBHelper.database();
+    return db.transaction((txn) async {
+      await txn.delete('satisfaction', where: "date = ?", whereArgs: [date]);
+      await txn.insert('satisfaction', satisfactionData);
+    });
+  }
+
+  // delete Satisfaction
+  static Future<void> deleteSatisfaction(
+    String date,
+  ) async {
+    final db = await DBHelper.database();
+    return db.delete('satisfaction', where: "date = ?", whereArgs: [date]);
   }
 }

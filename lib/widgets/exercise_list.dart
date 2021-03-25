@@ -172,19 +172,28 @@ class _ExerciseListState extends State<ExerciseList> {
     } else if (widget.isForFilters) {
       // for filters dialog
       return Consumer<Filters>(
+        key: key,
         builder: (ctx, filters, ch) {
-          return SwitchListTile.adaptive(
-            key: key,
-            activeColor: Colors.teal,
-            value: filters.items[ex.id],
-            title: ch,
-            onChanged: (newVal) {
+          return GestureDetector(
+            onTap: () {
               filters.switchItem(ex.id);
             },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 7),
+              child: Row(
+                children: [
+                  Expanded(child: ch),
+                  Icon(filters.items[ex.id]
+                      ? Icons.check_box_outlined
+                      : Icons.check_box_outline_blank),
+                ],
+              ),
+            ),
           );
         },
         child: Text(
           ex.name,
+          style: TextStyle(fontSize: 18),
           softWrap: false,
           overflow: TextOverflow.ellipsis,
         ),

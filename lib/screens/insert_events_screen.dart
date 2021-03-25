@@ -87,7 +87,7 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
       context: context,
       builder: (bctx) => AlertDialog(
         scrollable: true, //
-        title: Text('운동 추가하기'),
+        title: Text('종목 추가하기'),
         content: ExerciseList(
           isForAddExtra: true,
           alreadySelected: events.map((e) => e.exerciseId).toList(),
@@ -122,11 +122,6 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
         routines.addRoutine(routine.name, events);
       } else {
         // edit routine
-        //  events.forEach((e) {
-        //   e.setDetails.forEach((s) {
-        //     print('${s.weight}  ${s.rep}');
-        //   });
-        // });
         routines.updateRoutine(
             id: widget.routineId, name: routine.name, events: events);
       }
@@ -217,7 +212,6 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
     if (!isSure) {
       return;
     }
-
     routines.deleteRoutine(routine.id);
     Navigator.of(context).popUntil(ModalRoute.withName('/'));
   }
@@ -369,12 +363,14 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
   @override
   Widget build(BuildContext context) {
     print('build Insert Events Screen!');
+    // appBar of Insert Event screen
     final _appBar = AppBar(
       title: widget.isForRoutine
           ? (widget.isRawInsert ? Text('루틴을 구성하세요.') : Text('루틴을 수정하세요.'))
           : Text('추가: ${DateFormat('M월 d일').format(day)}의 운동'),
       leading: widget.isForRoutine && !widget.isRawInsert ? Container() : null,
       actions: [
+        // add extra event
         GestureDetector(
           onTap: _onAddExtra,
           child: Container(
@@ -408,7 +404,6 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
               FocusScopeNode currentFocus = FocusScope.of(context);
               if (!currentFocus.hasPrimaryFocus &&
                   currentFocus.focusedChild != null) {
-                print('hey');
                 FocusManager.instance.primaryFocus.unfocus();
               }
             }

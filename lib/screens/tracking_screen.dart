@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/events.dart';
 import '../providers/exercises.dart';
 import '../widgets/exercise_list.dart';
 import '../widgets/display_events.dart';
+import '../widgets/chart.dart';
 
 class TrackingScreen extends StatefulWidget {
   static const routeName = '/tracking_screen';
@@ -16,9 +16,11 @@ class TrackingScreen extends StatefulWidget {
 class _TrackingScreenState extends State<TrackingScreen> {
   String selectedId;
   Exercises exercises;
+  int bodyIdx;
 
   @override
   void initState() {
+    bodyIdx = 0;
     exercises = Provider.of<Exercises>(context, listen: false);
     super.initState();
   }
@@ -48,30 +50,49 @@ class _TrackingScreenState extends State<TrackingScreen> {
               }
             },
             child: selectedId == null
-                ? Text('운동 선택')
-                : Text('${exercises.getExercise(selectedId).name}'))
+                ? Text('<운동 선택>')
+                : Text(
+                    '운동: ${exercises.getExercise(selectedId).name}',
+                    overflow: TextOverflow.ellipsis,
+                  ))
       ],
     );
   }
 
-  Widget get functionRow {
+  Widget get buttonsRow {
     return Row(
       children: [
         Expanded(
-            child: ElevatedButton(onPressed: () {}, child: Text('기록으로 보기'))),
+            child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    bodyIdx = 0;
+                  });
+                },
+                child: Text('기록으로 보기'))),
         Expanded(
-            child: ElevatedButton(onPressed: () {}, child: Text('그래프로 보기'))),
+            child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    bodyIdx = 1;
+                  });
+                },
+                child: Text('그래프로 보기'))),
       ],
     );
   }
 
-  Widget get eventsColumn {
-    return Expanded(
-      child: DisplayEvents(
-        isTrackedEvents: true,
-        exerciseId: selectedId,
-      ),
-    );
+  Widget get contentToShow {
+    if (bodyIdx == 0) {
+      return Expanded(
+        child: DisplayEvents(
+          isTrackedEvents: true,
+          exerciseId: selectedId,
+        ),
+      );
+    } else {
+      return Expanded(child: Chart(selectedId));
+    }
   }
 
   @override
@@ -80,12 +101,14 @@ class _TrackingScreenState extends State<TrackingScreen> {
       appBar: AppBar(
         title: Text('성장기록을 확인하세요.'),
       ),
-      body: Column(
-        children: [
-          nameBox,
-          functionRow,
-          eventsColumn,
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            nameBox,
+            buttonsRow,
+            contentToShow,
+          ],
+        ),
       ),
     );
   }

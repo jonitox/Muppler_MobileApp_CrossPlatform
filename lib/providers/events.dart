@@ -3,7 +3,6 @@ import 'package:uuid/uuid.dart';
 
 import '../helpers/dbhelper.dart';
 import '../models/event.dart';
-import '../models/routine.dart';
 
 class Events with ChangeNotifier {
   List<Event> _items = [];

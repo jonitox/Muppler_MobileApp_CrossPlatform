@@ -5,6 +5,7 @@ import '../providers/events.dart';
 import '../providers/exercises.dart';
 import '../providers/routines.dart';
 import '../providers/filters.dart';
+import '../providers/satisfactions.dart';
 import '../providers/tap_page_index.dart';
 
 import './manage_screen.dart';
@@ -28,6 +29,8 @@ class TabScreen extends StatelessWidget {
     final ids =
         await Provider.of<Exercises>(ctx, listen: false).fetchAndSetExercises();
     Provider.of<Filters>(ctx, listen: false).addFilters(ids);
+    await Provider.of<Satisfactions>(ctx, listen: false)
+        .fetchAndSetSatisfactions();
   }
 
   // tap set Filter button
@@ -85,8 +88,8 @@ class TabScreen extends StatelessWidget {
               label: '라이브러리',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.timer),
-              label: '기능',
+              icon: Icon(Icons.pan_tool),
+              label: '서비스',
             ),
           ],
           currentIndex: pageIdx.curIdx,

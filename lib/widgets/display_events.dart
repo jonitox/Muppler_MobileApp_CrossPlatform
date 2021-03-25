@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 
 import '../screens/edit_event_screen.dart';
 
@@ -43,7 +42,11 @@ class DisplayEvents extends StatelessWidget {
         ? Center(
             heightFactor: 3,
             child: Text(
-              isDailyEvents ? '계획된 운동이 없습니다.' : '오늘은 계획된 운동이 없습니다!',
+              isDailyEvents
+                  ? '계획된 운동이 없습니다.'
+                  : (isTodayEvents
+                      ? '오늘은 계획된 운동이 없습니다!'
+                      : '기록을 확인할 운동을 선택하세요!'),
               softWrap: true,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -83,8 +86,8 @@ class _EventTileState extends State<EventTile> {
   }
 
   // remove fractional parts of double
-  String removeDecimalZeroFormat(double n) {
-    return n.toString().replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
+  String removeDecimalZeroFormat(String n) {
+    return n.replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
   }
 
   // ************ title of event tile ************ //
@@ -195,9 +198,10 @@ class _EventTileState extends State<EventTile> {
   // ************ event Summary ************ //
   Widget get eventSummary {
     final vol = widget.event.volume;
-    final volText =
-        (vol is double ? removeDecimalZeroFormat(vol) : vol.toString()) +
-            (vol is double ? 'kg' : '개');
+    final volText = (vol is double
+            ? removeDecimalZeroFormat(vol.toStringAsFixed(1))
+            : vol.toString()) +
+        (vol is double ? 'kg' : '개');
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -224,7 +228,7 @@ class _EventTileState extends State<EventTile> {
                 Text('${idx + 1}세트'),
                 if (widget.event.type == DetailType.basic)
                   Text(
-                      '${removeDecimalZeroFormat(widget.event.setDetails[idx].weight)}Kg'),
+                      '${removeDecimalZeroFormat(widget.event.setDetails[idx].weight.toStringAsFixed(1))}Kg'),
                 Text('${widget.event.setDetails[idx].rep}회'),
               ],
             ),

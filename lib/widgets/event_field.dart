@@ -84,8 +84,8 @@ class _EventFieldBoxState extends State<EventFieldBox> {
   }
 
   // remove fractional parts of double
-  String removeDecimalZeroFormat(double n) {
-    return n.toString().replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
+  String removeDecimalZeroFormat(String n) {
+    return n.replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
   }
 
   // update Set PlaceHolder
@@ -243,7 +243,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
         ),
         if (widget.isEdit)
           ElevatedButton(
-              child: Text('종목 변경'), onPressed: () => onTapChangeExercise()),
+              child: Text('운동 변경'), onPressed: () => onTapChangeExercise()),
         if (!widget.isEdit)
           Container(
             child: FittedBox(
@@ -265,7 +265,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
 // ************ event summary row ************ //
   Widget get summaryRow {
     final vol = (event.volume is double
-                ? removeDecimalZeroFormat(event.volume)
+                ? removeDecimalZeroFormat(event.volume.toStringAsFixed(1))
                 : event.volume.toString())
             .toString() +
         (event.type == DetailType.onlyRep ? '개' : 'kg');
@@ -394,7 +394,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
                     Row(
                       children: [
                         Text(
-                          '${removeDecimalZeroFormat(weightToInsert)}',
+                          '${removeDecimalZeroFormat(weightToInsert.toStringAsFixed(1))}',
                           style: TextStyle(
                             fontSize: 22,
                             // decoration: TextDecoration.underline,
@@ -509,7 +509,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
                         width: deviceSize.width * 0.2,
                         child: Center(
                             child: Text(
-                          '${removeDecimalZeroFormat(event.setDetails[i].weight)}Kg',
+                          '${removeDecimalZeroFormat(event.setDetails[i].weight.toStringAsFixed(1))}Kg',
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 15,

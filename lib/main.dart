@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
-import 'package:work_out_tracker/providers/lap_times.dart';
 
 import './screens/timer_screen.dart';
 import './screens/tracking_screen.dart';
@@ -17,6 +16,8 @@ import './providers/exercises.dart';
 import './providers/calendar_state.dart';
 import './providers/routines.dart';
 import 'providers/stopwatch_state.dart';
+import './providers/lap_times.dart';
+import './providers/satisfactions.dart';
 
 void main() {
   initializeDateFormatting().then((_) => runApp(MyApp()));
@@ -39,9 +40,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (ctx) => CalendarState(),
         ),
-        // ChangeNotifierProvider(
-        //   create: (ctx) => SelectedExercise(),
-        // ),
+        ChangeNotifierProvider(
+          create: (ctx) => Satisfactions(),
+        ),
         ChangeNotifierProvider(
           create: (ctx) => Routines(),
         ),

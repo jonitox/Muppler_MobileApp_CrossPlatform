@@ -136,8 +136,8 @@ class _RoutineTileState extends State<RoutineTile> {
   }
 
   // remove fractional parts of double
-  String removeDecimalZeroFormat(double n) {
-    return n.toString().replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
+  String removeDecimalZeroFormat(String n) {
+    return n.replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
   }
 
   // ************  routine title row ************ //
@@ -186,7 +186,7 @@ class _RoutineTileState extends State<RoutineTile> {
           ),
         ),
         Text(
-          '볼륨 ${removeDecimalZeroFormat(widget.r.volume)}kg',
+          '볼륨 ${removeDecimalZeroFormat(widget.r.volume.toStringAsFixed(1))}kg',
           style: TextStyle(
             color: themeData.accentColor,
             fontSize: 14,
@@ -241,7 +241,7 @@ class _RoutineTileState extends State<RoutineTile> {
                 ),
               ),
               Text(
-                  '세트 수: ${e.setDetails.length}  볼륨: ${e.type == DetailType.basic ? removeDecimalZeroFormat(e.volume) : e.volume}' +
+                  '세트 수: ${e.setDetails.length}  볼륨: ${e.type == DetailType.basic ? removeDecimalZeroFormat(e.volume.toStringAsFixed(1)) : e.volume}' +
                       (e.type == DetailType.onlyRep ? '개' : 'kg')),
             ],
           ),
@@ -254,7 +254,8 @@ class _RoutineTileState extends State<RoutineTile> {
               children: [
                 Text('${i + 1}세트'),
                 if (e.type == DetailType.basic)
-                  Text('${removeDecimalZeroFormat(e.setDetails[i].weight)}Kg'),
+                  Text(
+                      '${removeDecimalZeroFormat(e.setDetails[i].weight.toStringAsFixed(1))}Kg'),
                 Text('${e.setDetails[i].rep}회'),
               ],
             ),

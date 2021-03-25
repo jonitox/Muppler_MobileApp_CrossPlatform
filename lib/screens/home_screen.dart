@@ -110,7 +110,7 @@ class HomeScreen extends StatelessWidget {
             fit: BoxFit.fitWidth,
             child: Text(
               '당신이 하고있는 운동을 관리하세요.',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -134,10 +134,14 @@ class HomeScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '운동 라이브러리',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  '라이브러리',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w500),
                 ),
-                Icon(Icons.keyboard_arrow_right_rounded)
+                Icon(
+                  Icons.keyboard_arrow_right_rounded,
+                  color: Colors.white,
+                )
               ],
             ),
           ),
@@ -148,7 +152,7 @@ class HomeScreen extends StatelessWidget {
 
   // ************ Setting Button ************ //
   Widget get settingButton {
-    return IconButton(icon: Icon(Icons.settings), onPressed: () {});
+    return IconButton(icon: Icon(Icons.settings_outlined), onPressed: () {});
   }
 
   // ************  build home screen ************ //
