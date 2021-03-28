@@ -114,7 +114,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: Container(),
-        title: Text('기록을 수정하세요.'),
+        title: Text('운동기록 수정'),
       ),
       body: SafeArea(
         child: Form(

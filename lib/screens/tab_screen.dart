@@ -13,8 +13,6 @@ import './calendar_screen.dart';
 import './functions_screen.dart';
 import './home_screen.dart';
 
-import '../widgets/filters_dialog.dart';
-
 class TabScreen extends StatelessWidget {
   final List<Map<String, Object>> _pages = [
     {'title': 'MUPPLER', 'page': HomeScreen()},
@@ -41,14 +39,17 @@ class TabScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Consumer<TapPageIndex>(
-          builder: (ctx, pageIdx, _) => Text(
-            _pages[pageIdx.curIdx]['title'],
-            style: Theme.of(context).appBarTheme.titleTextStyle.copyWith(
-                fontSize: pageIdx.curIdx == 0 ? 34 : 24,
-                color:
-                    pageIdx.curIdx == 0 ? Colors.deepOrange[400] : Colors.white,
-                fontWeight:
-                    pageIdx.curIdx == 0 ? FontWeight.w900 : FontWeight.bold),
+          builder: (ctx, pageIdx, _) => Center(
+            child: Text(
+              _pages[pageIdx.curIdx]['title'],
+              style: Theme.of(context).appBarTheme.titleTextStyle.copyWith(
+                  fontSize: pageIdx.curIdx == 0 ? 34 : 24,
+                  color: pageIdx.curIdx == 0
+                      ? Colors.deepOrange[600]
+                      : Colors.white,
+                  fontWeight:
+                      pageIdx.curIdx == 0 ? FontWeight.w900 : FontWeight.bold),
+            ),
           ),
         ),
         bottom: PreferredSize(

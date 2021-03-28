@@ -9,7 +9,7 @@ class TimerScreen extends StatelessWidget {
   static const routeName = 'timer_screen';
 
   // ************ on add overlay  ************ //
-  void swtichToOverlay(BuildContext ctx) {
+  static void swtichToOverlay(BuildContext ctx) {
     final deviceSize = MediaQuery.of(ctx).size;
     final themeData = Theme.of(ctx);
     final laptimes = Provider.of<LapTimes>(ctx, listen: false);
@@ -47,7 +47,7 @@ class TimerScreen extends StatelessWidget {
   }
 
 // ************ time Box  ************ //
-  Widget timeBox(
+  static Widget timeBox(
       double deviceWidth, StopWatchState stopwatch, ThemeData themeData) {
     final timeSegs = stopwatch.getTime;
     return Container(
@@ -141,7 +141,7 @@ class TimerScreen extends StatelessWidget {
   }
 
   // ************  reset/shutdownOverlay button ************ //
-  Widget resetAndShutOverlayButton(
+  static Widget resetAndShutOverlayButton(
       LapTimes lapTimes, StopWatchState stopwatch, OverlayEntry entry) {
     return FloatingActionButton(
         backgroundColor: stopwatch.isRunning
@@ -163,7 +163,7 @@ class TimerScreen extends StatelessWidget {
   }
 
   // ************ start/pause button ************ //
-  Widget startAndPauseButton(StopWatchState stopwatch) {
+  static Widget startAndPauseButton(StopWatchState stopwatch) {
     return FloatingActionButton(
         backgroundColor: stopwatch.isRunning ? Colors.orange : Colors.blue[400],
         heroTag: 'btn2',
@@ -307,7 +307,10 @@ class TimerScreen extends StatelessWidget {
     final themeData = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('스탑워치'),
+        title: Text(
+          '스탑워치',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: Consumer<StopWatchState>(
         builder: (ctx, stopwatch, ch) => stopwatch.isOnOverlay

@@ -8,7 +8,10 @@ class PickExerciseOnlyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('루틴에 포함할 운동을 선택하세요.'),
+        title: Text(
+          '루틴의 운동을 선택하세요.',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: SafeArea(
         child: ExerciseList(

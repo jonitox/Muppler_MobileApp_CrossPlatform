@@ -243,7 +243,11 @@ class _EventFieldBoxState extends State<EventFieldBox> {
         ),
         if (widget.isEdit)
           ElevatedButton(
-              child: Text('운동 변경'), onPressed: () => onTapChangeExercise()),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.teal[300], // background
+              ),
+              child: Text('운동 변경'),
+              onPressed: () => onTapChangeExercise()),
         if (!widget.isEdit)
           Container(
             child: FittedBox(
@@ -343,19 +347,23 @@ class _EventFieldBoxState extends State<EventFieldBox> {
         Container(
           margin: const EdgeInsets.only(left: 5),
           padding: const EdgeInsets.all(5),
+          width: deviceSize.width * 0.2,
           decoration: BoxDecoration(
-              border: Border.all(width: 1, color: themeData.accentColor),
-              borderRadius: BorderRadius.circular(10)),
+              color: themeData.accentColor,
+              // border: Border.all(width: 1, color: themeData.accentColor),
+              borderRadius: BorderRadius.circular(5)),
           child: PopupMenuButton(
             // color: themeData.accentColor,
             child: event.type == DetailType.basic
-                ? Text('무게, 횟수', style: TextStyle(color: themeData.accentColor))
-                : Text('횟수', style: TextStyle(color: themeData.accentColor)),
+                ? Center(
+                    child:
+                        Text('무게, 횟수', style: TextStyle(color: Colors.white)))
+                : Center(
+                    child: Text('횟수', style: TextStyle(color: Colors.white))),
             itemBuilder: (ctx) => [
               PopupMenuItem(
                 child: Text(
                   '무게, 횟수',
-                  style: TextStyle(color: themeData.accentColor),
                   softWrap: true,
                 ),
                 value: 0,
@@ -363,7 +371,6 @@ class _EventFieldBoxState extends State<EventFieldBox> {
               PopupMenuItem(
                 child: Text(
                   '횟수',
-                  style: TextStyle(color: themeData.accentColor),
                   softWrap: true,
                 ),
                 value: 1,
@@ -385,6 +392,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 border: Border.all(width: 1, color: Colors.deepOrange),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -436,27 +444,21 @@ class _EventFieldBoxState extends State<EventFieldBox> {
           ),
         ),
         Container(
-          margin: const EdgeInsets.only(
-            right: 5,
-          ),
-          child: FittedBox(
-            child: ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                  (_) => themeData.accentColor,
-                ),
-                minimumSize: MaterialStateProperty.resolveWith<Size>(
-                    (_) => Size(deviceSize.width * 0.15, 40)),
-              ),
-              onPressed: () {
-                event.addSet(Set(
-                  weightToInsert,
-                  repToInsert,
-                ));
-                widget.state.didChange(event); // memoy leak?
-              },
-              child: Text('세트 추가'),
+          margin: const EdgeInsets.only(right: 5),
+          width: deviceSize.width * 0.2,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: themeData.accentColor,
+              padding: EdgeInsets.all(5),
             ),
+            onPressed: () {
+              event.addSet(Set(
+                weightToInsert,
+                repToInsert,
+              ));
+              widget.state.didChange(event); // memoy leak?
+            },
+            child: Text('세트 추가'),
           ),
         ),
       ],
@@ -498,7 +500,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
               child: Container(
                 margin: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Colors.grey),
+                  border: Border.all(width: 1, color: Colors.deepOrange[300]),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(

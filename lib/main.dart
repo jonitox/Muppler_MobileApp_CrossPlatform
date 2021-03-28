@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
@@ -20,6 +21,10 @@ import './providers/lap_times.dart';
 import './providers/satisfactions.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   initializeDateFormatting().then((_) => runApp(MyApp()));
 }
 
@@ -61,14 +66,15 @@ class MyApp extends StatelessWidget {
         //* Theme *//
         theme: ThemeData(
           buttonTheme: ButtonThemeData(
-            buttonColor: Colors.red,
+            buttonColor: Colors.teal,
           ),
-          primarySwatch: Colors.teal,
-          accentColor: Colors.deepOrange[400],
+          primaryColor: Colors.teal[300],
+          // primarySwatch: Colors.teal[300],
+          accentColor: Colors.deepOrange[300],
           // AppBar theme
           appBarTheme: AppBarTheme(
             color: Colors.teal[200],
-            titleTextStyle: TextStyle(color: Colors.blue[200]),
+            titleTextStyle: TextStyle(color: Colors.teal[200]),
             elevation: 5,
             shadowColor: Colors.black,
           ),

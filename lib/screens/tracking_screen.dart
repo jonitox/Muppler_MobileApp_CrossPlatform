@@ -99,7 +99,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('성장기록을 확인하세요.'),
+        title: Text(
+          '성장기록을 확인하세요.',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: SafeArea(
         child: Column(

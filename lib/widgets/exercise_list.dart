@@ -296,9 +296,7 @@ class _ExerciseListState extends State<ExerciseList> {
           categoriesBox,
 
           Expanded(child: exercisesListTiles),
-          Divider(
-            color: Colors.black,
-          ),
+          Divider(),
           if (widget.isForManage)
             floatingButton(
               isBadge: false,

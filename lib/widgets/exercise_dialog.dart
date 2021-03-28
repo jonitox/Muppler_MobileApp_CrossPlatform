@@ -82,6 +82,7 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
   // ************ category chips ************ //
   Widget get categoryChips {
     return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: Target.valuesExceptAll
@@ -137,6 +138,9 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: Colors.teal[300], // background
+            ),
             onPressed: () {
               if (_formKey.currentState.validate()) {
                 _formKey.currentState.save();
@@ -147,6 +151,9 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
           ),
           if (!widget.isInsert)
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.teal[300], // background
+              ),
               onPressed: _onDelete,
               child: Text('운동 삭제'),
             ),

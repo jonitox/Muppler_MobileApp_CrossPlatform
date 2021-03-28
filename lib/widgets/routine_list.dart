@@ -47,11 +47,6 @@ class _RoutineListState extends State<RoutineList> {
             : Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: ListView.builder(
-                  // separatorBuilder: (ctx, i) => Divider(
-                  //   height: 20,
-                  //   thickness: 0.8,
-                  //   color: Colors.grey,
-                  // ),
                   itemCount: items.length,
                   itemBuilder: (ctx, i) => GestureDetector(
                     key: ValueKey(items[i].id),

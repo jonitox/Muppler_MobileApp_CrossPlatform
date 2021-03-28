@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:work_out_tracker/providers/stopwatch_state.dart';
 
 import '../models/event.dart';
 
+import './timer_screen.dart';
 import '../models/routine.dart';
 import '../widgets/event_field.dart';
 import '../widgets/custom_floating_button.dart';
@@ -363,33 +365,55 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
   @override
   Widget build(BuildContext context) {
     print('build Insert Events Screen!');
+    final stopwatch = Provider.of<StopWatchState>(context);
     // appBar of Insert Event screen
     final _appBar = AppBar(
       title: widget.isForRoutine
-          ? (widget.isRawInsert ? Text('루틴을 구성하세요.') : Text('루틴을 수정하세요.'))
-          : Text('추가: ${DateFormat('M월 d일').format(day)}의 운동'),
+          ? (widget.isRawInsert
+              ? Text(
+                  '루틴을 구성하세요.',
+                  style: TextStyle(color: Colors.white),
+                )
+              : Text(
+                  '루틴을 수정하세요.',
+                  style: TextStyle(color: Colors.white),
+                ))
+          : FittedBox(
+              child: Text(
+              '추가: ${DateFormat('M월 d일').format(day)}의 운동',
+              style: TextStyle(color: Colors.white),
+            )),
       leading: widget.isForRoutine && !widget.isRawInsert ? Container() : null,
       actions: [
+        if (!widget.isForRoutine)
+          IconButton(
+              color: Colors.white,
+              icon: Icon(Icons.timer_outlined),
+              onPressed: stopwatch.isOnOverlay
+                  ? null
+                  : () {
+                      stopwatch.switchOverlay();
+                      TimerScreen.swtichToOverlay(context);
+                    }),
         // add extra event
         GestureDetector(
           onTap: _onAddExtra,
           child: Container(
-            margin: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 5,
-            ),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(width: 1, color: Colors.white),
-            ),
-            child: Center(
-              child: Icon(
-                Icons.add,
-                // size: 30,
-              ),
+            margin: const EdgeInsets.only(right: 10
+                // vertical: 5,
+                ),
+            // padding: const EdgeInsets.all(8),
+            // decoration: BoxDecoration(
+            //   shape: BoxShape.circle,
+            //   border: Border.all(width: 1, color: Colors.white),
+            // ),
+            // child: Center(
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
             ),
           ),
+          // ),
         ),
       ],
     );

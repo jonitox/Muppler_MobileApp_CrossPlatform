@@ -132,6 +132,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     print('build Calendar Screen!');
+    final deviceSize = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[
@@ -139,8 +140,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           calendarSettingsRow,
           Divider(
             height: 20,
-            thickness: 0.8,
-            color: Theme.of(context).primaryColor,
+            thickness: 1,
           ),
           DailyTitle(),
           addEventButton,

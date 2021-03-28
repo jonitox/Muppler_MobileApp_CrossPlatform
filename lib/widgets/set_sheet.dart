@@ -49,15 +49,17 @@ class _SetSheetState extends State<SetSheet> {
   // ************ digit picker ************ //
   Widget picker(MediaQueryData mediaData, int idx) {
     return Container(
+      margin: EdgeInsets.symmetric(vertical: mediaData.size.height / 30),
       width: mediaData.size.width / 10,
       decoration: BoxDecoration(
-        border: Border.all(width: 1, color: Colors.black),
+        border: Border.all(width: 1, color: Colors.grey),
+        borderRadius: BorderRadius.circular(5),
       ),
       child: CupertinoPicker(
         scrollController: _scrollControllers[idx],
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white,
         children: nums,
-        itemExtent: 40,
+        itemExtent: mediaData.size.height / 20,
         looping: false,
         onSelectedItemChanged: (int x) {
           widget.updateSetInfoHolders(
@@ -79,6 +81,7 @@ class _SetSheetState extends State<SetSheet> {
           '.',
           style: TextStyle(
             fontSize: 50,
+            // color: Colors.teal,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -87,8 +90,7 @@ class _SetSheetState extends State<SetSheet> {
           'kg',
           style: TextStyle(
             fontSize: 30,
-            fontWeight: FontWeight.bold,
-            color: Colors.teal,
+            // color: Colors.teal,
           ),
         ),
       ],
@@ -108,7 +110,7 @@ class _SetSheetState extends State<SetSheet> {
           style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.bold,
-            color: Colors.teal,
+            // color: Colors.teal,
           ),
         ),
       ],
@@ -127,6 +129,7 @@ class _SetSheetState extends State<SetSheet> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (!widget.isOnlyRep) weightPickerRow(mediaData),
+          SizedBox(width: mediaData.size.width / 25),
           repPickerRow(mediaData),
         ],
       ),

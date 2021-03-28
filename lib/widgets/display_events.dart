@@ -43,7 +43,7 @@ class DisplayEvents extends StatelessWidget {
             heightFactor: 3,
             child: Text(
               isDailyEvents
-                  ? '계획된 운동이 없습니다.'
+                  ? '기록한 운동이 없습니다.'
                   : (isTodayEvents
                       ? '오늘은 계획된 운동이 없습니다!'
                       : '기록을 확인할 운동을 선택하세요!'),

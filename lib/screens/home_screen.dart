@@ -169,13 +169,11 @@ class HomeScreen extends StatelessWidget {
             Divider(
               height: 20,
               thickness: 0.8,
-              color: Theme.of(context).primaryColor, // theme
             ),
             libraryBox(context, pageIdx),
             Divider(
               height: 20,
               thickness: 0.8,
-              color: Theme.of(context).primaryColor,
             ),
             settingButton,
           ],
