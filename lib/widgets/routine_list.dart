@@ -138,6 +138,7 @@ class _RoutineTileState extends State<RoutineTile> {
   // ************  routine title row ************ //
   Widget get routineTitleRow {
     final themeData = Theme.of(context);
+    final deviceSize = MediaQuery.of(context).size;
     return Row(
       children: [
         Stack(
@@ -168,7 +169,7 @@ class _RoutineTileState extends State<RoutineTile> {
           '총 ${widget.r.items.length}개의 운동 ',
           style: TextStyle(
             color: themeData.primaryColor,
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -176,7 +177,7 @@ class _RoutineTileState extends State<RoutineTile> {
           '총 ${widget.r.numberOfSets}세트 ',
           style: TextStyle(
             color: Colors.blueGrey,
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -184,7 +185,7 @@ class _RoutineTileState extends State<RoutineTile> {
           '볼륨 ${removeDecimalZeroFormat(widget.r.volume.toStringAsFixed(1))}kg',
           style: TextStyle(
             color: themeData.accentColor,
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -236,7 +237,7 @@ class _RoutineTileState extends State<RoutineTile> {
                 ),
               ),
               Text(
-                  '세트 수: ${e.setDetails.length}  볼륨: ${e.type == DetailType.basic ? removeDecimalZeroFormat(e.volume.toStringAsFixed(1)) : e.volume}' +
+                  '세트 수 ${e.setDetails.length}  볼륨 ${e.type == DetailType.basic ? removeDecimalZeroFormat(e.volume.toStringAsFixed(1)) : e.volume}' +
                       (e.type == DetailType.onlyRep ? '개' : 'kg')),
             ],
           ),

@@ -28,62 +28,96 @@ class _TrackingScreenState extends State<TrackingScreen> {
   Widget get nameBox {
     return Row(
       children: [
-        TextButton(
-            onPressed: () async {
-              final changedId = await showDialog(
-                barrierDismissible: true,
-                context: context,
-                builder: (bctx) => AlertDialog(
-                  scrollable: true, //
-                  title: Text('운동선택'),
-                  content:
-                      ExerciseList(isForSelect: true, selectedId: selectedId),
-                ),
-              );
-              if (changedId == null) {
-                return;
-              }
-              if (changedId != selectedId) {
-                setState(() {
-                  selectedId = changedId;
-                });
-              }
-            },
-            child: selectedId == null
-                ? Text('<운동 선택>')
-                : Text(
-                    '운동: ${exercises.getExercise(selectedId).name}',
-                    overflow: TextOverflow.ellipsis,
-                  ))
+        Expanded(
+          child: TextButton(
+              onPressed: () async {
+                final changedId = await showDialog(
+                  barrierDismissible: true,
+                  context: context,
+                  builder: (bctx) => AlertDialog(
+                    scrollable: true, //
+                    title: Text('운동선택'),
+                    content:
+                        ExerciseList(isForSelect: true, selectedId: selectedId),
+                  ),
+                );
+                if (changedId == null) {
+                  return;
+                }
+                if (changedId != selectedId) {
+                  setState(() {
+                    selectedId = changedId;
+                  });
+                }
+              },
+              child: selectedId == null
+                  ? Text(
+                      '< 운동 선택 >',
+                      style: TextStyle(color: Colors.teal, fontSize: 18),
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  : Text(
+                      '${exercises.getExercise(selectedId).name}',
+                      style: TextStyle(color: Colors.teal, fontSize: 18),
+                      overflow: TextOverflow.ellipsis,
+                    )),
+        )
       ],
     );
   }
 
   Widget get buttonsRow {
+    final themeData = Theme.of(context);
     return Row(
       children: [
         Expanded(
-            child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    bodyIdx = 0;
-                  });
-                },
-                child: Text('기록으로 보기'))),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                primary: bodyIdx == 0 ? themeData.accentColor : Colors.white),
+            onPressed: () {
+              setState(() {
+                bodyIdx = 0;
+              });
+            },
+            child: FittedBox(
+              child: Text(
+                '기록으로 보기(시간순)',
+                style: TextStyle(
+                    color: bodyIdx == 0 ? Colors.white : Colors.black),
+              ),
+            ),
+          ),
+        ),
         Expanded(
-            child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    bodyIdx = 1;
-                  });
-                },
-                child: Text('그래프로 보기'))),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                primary: bodyIdx == 1 ? themeData.accentColor : Colors.white),
+            onPressed: () {
+              setState(() {
+                bodyIdx = 1;
+              });
+            },
+            child: FittedBox(
+              child: Text(
+                '그래프로 보기',
+                style: TextStyle(
+                    color: bodyIdx == 1 ? Colors.white : Colors.black),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
 
   Widget get contentToShow {
-    if (bodyIdx == 0) {
+    if (selectedId == null) {
+      return Expanded(
+        child: Center(
+          child: Text('운동을 선택하세요'),
+        ),
+      );
+    } else if (bodyIdx == 0) {
       return Expanded(
         child: DisplayEvents(
           isTrackedEvents: true,

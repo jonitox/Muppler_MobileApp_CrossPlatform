@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -44,9 +46,7 @@ class DisplayEvents extends StatelessWidget {
             child: Text(
               isDailyEvents
                   ? '기록한 운동이 없습니다.'
-                  : (isTodayEvents
-                      ? '오늘은 계획된 운동이 없습니다!'
-                      : '기록을 확인할 운동을 선택하세요!'),
+                  : (isTodayEvents ? '오늘은 계획된 운동이 없습니다!' : '기록 없음'),
               softWrap: true,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -120,10 +120,12 @@ class _EventTileState extends State<EventTile> {
               if (widget.isTracked)
                 Expanded(
                   child: Text(
-                    '${DateFormat('yyyy년 M월 dd일', 'ko').format(widget.event.date)}',
+                    '${DateFormat('yyyy년\n M월 dd일', 'ko').format(widget.event.date)}',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                     ),
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               Chip(

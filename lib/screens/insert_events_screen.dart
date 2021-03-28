@@ -383,7 +383,8 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
               '추가: ${DateFormat('M월 d일').format(day)}의 운동',
               style: TextStyle(color: Colors.white),
             )),
-      leading: widget.isForRoutine && !widget.isRawInsert ? Container() : null,
+      automaticallyImplyLeading:
+          widget.isForRoutine && !widget.isRawInsert ? false : true,
       actions: [
         if (!widget.isForRoutine)
           IconButton(

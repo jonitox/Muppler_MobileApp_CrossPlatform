@@ -77,20 +77,20 @@ class TabScreen extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
           items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: Icon(Icons.home_outlined),
               label: '홈',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today),
+              icon: Icon(Icons.calendar_today_outlined),
               label: '운동 기록',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.fitness_center),
+              icon: Icon(Icons.fitness_center_outlined),
               label: '라이브러리',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.pan_tool),
-              label: '서비스',
+              icon: Icon(Icons.architecture_outlined),
+              label: '기능',
             ),
           ],
           currentIndex: pageIdx.curIdx,

@@ -252,7 +252,9 @@ class _ExerciseListState extends State<ExerciseList> {
           children: [
             categoriesBox,
             Expanded(child: exercisesListTiles),
-            TextButton(
+            ElevatedButton(
+                style:
+                    ElevatedButton.styleFrom(primary: themeData.primaryColor),
                 onPressed: () {
                   Navigator.of(context)
                       .pop(widget.isForSelect ? selectedId : isSelected);

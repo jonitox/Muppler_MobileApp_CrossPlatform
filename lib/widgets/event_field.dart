@@ -467,92 +467,103 @@ class _EventFieldBoxState extends State<EventFieldBox> {
 
   // ************ set details column  ************ //
   Widget setDetailsColumn(Size deviceSize) {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemExtent: 35,
-      itemCount: event.setDetails.length,
-      itemBuilder: (ctx, i) => Row(
-        key: ValueKey('set#$i'),
-        children: [
-          // *미추가: 세트 성공 여부 기능
-          // Container(
-          //   width: deviceSize.width * 0.1,
-          //   child: FittedBox(
-          //     fit: BoxFit.fitWidth,
-          //     child: OutlinedButton(
-          //       onPressed: () {},
-          //       child: Text('완료'),
-          //     ),
-          //   ),
-          // ),
-          Container(
-            // color: Colors.red,
-            width: deviceSize.width * 0.2,
+    return event.setDetails.length == 0
+        ? Container(
+            height: 30,
             child: Center(
-                child: Text(
-              '${i + 1}세트',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            )),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onTapSetRow(setNumber: i + 1),
-              child: Container(
-                margin: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Colors.deepOrange[300]),
-                  borderRadius: BorderRadius.circular(10),
+              child: Text(
+                '세트 없음',
+                style: TextStyle(color: Colors.deepOrange[300]),
+              ),
+            ),
+          )
+        : ListView.builder(
+            shrinkWrap: true,
+            itemExtent: 35,
+            itemCount: event.setDetails.length,
+            itemBuilder: (ctx, i) => Row(
+              key: ValueKey('set#$i'),
+              children: [
+                // *미추가: 세트 성공 여부 기능
+                // Container(
+                //   width: deviceSize.width * 0.1,
+                //   child: FittedBox(
+                //     fit: BoxFit.fitWidth,
+                //     child: OutlinedButton(
+                //       onPressed: () {},
+                //       child: Text('완료'),
+                //     ),
+                //   ),
+                // ),
+                Container(
+                  // color: Colors.red,
+                  width: deviceSize.width * 0.2,
+                  child: Center(
+                      child: Text(
+                    '${i + 1}세트',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  )),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    if (event.type == DetailType.basic)
-                      Container(
-                        width: deviceSize.width * 0.2,
-                        child: Center(
-                            child: Text(
-                          '${removeDecimalZeroFormat(event.setDetails[i].weight.toStringAsFixed(1))}Kg',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 15,
-                          ),
-                        )),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => onTapSetRow(setNumber: i + 1),
+                    child: Container(
+                      margin: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        border:
+                            Border.all(width: 1, color: Colors.deepOrange[300]),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    Container(
-                      // color: Colors.red,
-                      width: deviceSize.width * 0.2,
-                      child: Center(
-                          child: Text(
-                        '${event.setDetails[i].rep}회',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 15,
-                        ),
-                      )),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          if (event.type == DetailType.basic)
+                            Container(
+                              width: deviceSize.width * 0.2,
+                              child: Center(
+                                  child: Text(
+                                '${removeDecimalZeroFormat(event.setDetails[i].weight.toStringAsFixed(1))}Kg',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 15,
+                                ),
+                              )),
+                            ),
+                          Container(
+                            // color: Colors.red,
+                            width: deviceSize.width * 0.2,
+                            child: Center(
+                                child: Text(
+                              '${event.setDetails[i].rep}회',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 15,
+                              ),
+                            )),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+                Container(
+                  // color: Colors.blue,
+                  width: deviceSize.width * 0.07,
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: IconButton(
+                      iconSize: 28,
+                      icon: Icon(Icons.delete_outline_outlined),
+                      onPressed: () {
+                        event.removeSet(i);
+                        widget.state.didChange(event);
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          Container(
-            // color: Colors.blue,
-            width: deviceSize.width * 0.07,
-            child: FittedBox(
-              fit: BoxFit.fitWidth,
-              child: IconButton(
-                iconSize: 28,
-                icon: Icon(Icons.delete_outline_outlined),
-                onPressed: () {
-                  event.removeSet(i);
-                  widget.state.didChange(event);
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 
   @override
