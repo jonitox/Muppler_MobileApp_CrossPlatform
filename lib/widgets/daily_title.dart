@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:work_out_tracker/providers/satisfactions.dart';
 
+import '../providers/satisfactions.dart';
 import '../providers/events.dart';
 import '../providers/calendar_state.dart';
 import '../providers/filters.dart';
 
+// ************ daily title of calendar screen ************ //
 class DailyTitle extends StatelessWidget {
   // remove fractional parts of double
   String removeDecimalZeroFormat(double n) {
     return n.toString().replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
   }
 
-  // ************ build daily title line (month/day, num of exercises, total volume of day) ************ //
+  // ************ build daily title  (month/day, events summary, satsifaction) ************ //
   @override
   Widget build(BuildContext context) {
     print('build dailyTitle!');
@@ -26,6 +27,7 @@ class DailyTitle extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // month/day, events summary
         Container(
           margin: const EdgeInsets.only(top: 10, bottom: 5),
           padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -34,17 +36,18 @@ class DailyTitle extends StatelessWidget {
             children: [
               Text(
                 '${DateFormat('MM/dd').format(today).toString()}',
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 25,
                     fontStyle: FontStyle.italic,
                     fontWeight: FontWeight.w500),
+                softWrap: true,
               ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     '${events.getTodayEventsNum(today, filters)}개의 운동',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.teal,
                       fontWeight: FontWeight.w500,
                     ),
@@ -64,6 +67,7 @@ class DailyTitle extends StatelessWidget {
             ],
           ),
         ),
+        // satisfaction
         Container(
           width: deviceWidth * 0.52,
           height: deviceWidth * 0.12,
@@ -73,7 +77,7 @@ class DailyTitle extends StatelessWidget {
             children: [
               Container(
                   width: deviceWidth * 0.1,
-                  child: FittedBox(child: Text('만족도 '))),
+                  child: const FittedBox(child: const Text('만족도 '))),
               GestureDetector(
                 onTap: () {
                   satisfactions.changeSatisFaction(today, 1);

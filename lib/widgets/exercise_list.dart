@@ -5,14 +5,12 @@ import 'package:work_out_tracker/widgets/custom_floating_button.dart';
 
 import '../providers/exercises.dart';
 import '../providers/filters.dart';
-
 import '../screens/insert_events_screen.dart';
-
 import '../models/exercise.dart';
-
 import './exercise_dialog.dart';
 import './badge.dart';
 
+// ************ exercise list ************ //
 class ExerciseList extends StatefulWidget {
   final bool isForFilters;
   final bool isForManage;
@@ -40,28 +38,122 @@ class _ExerciseListState extends State<ExerciseList> {
   String selectedId;
   String selectedTargetName = Target.all;
   Map<String, bool> isSelected;
-
   ScrollController _rowScrollController;
   ScrollController _columnScrollController;
+
+  // init State
   void initState() {
     _rowScrollController = ScrollController();
     _columnScrollController = ScrollController();
 
     if (widget.isForInsert || widget.isForRoutine || widget.isForAddExtra) {
-      isSelected =
+      isSelected = // get Map<String(id), bool> for selection check.
           Provider.of<Exercises>(context, listen: false).getExercisesSelection;
     }
     if (widget.isForSelect) {
-      selectedId = widget.selectedId;
+      selectedId = widget.selectedId; // already selected item
     }
     super.initState();
   }
 
+  // dispose
   @override
   void dispose() {
     _rowScrollController.dispose();
     _columnScrollController.dispose();
     super.dispose();
+  }
+
+// ************ build widget(exercise list with cartegory) ************ //
+  @override
+  Widget build(BuildContext context) {
+    final deviceSize = MediaQuery.of(context).size;
+    final themeData = Theme.of(context);
+    print('build Exercise List!');
+    // * At exercise dialog by edit event screen & adding extra event *//
+    if (widget.isForSelect || widget.isForAddExtra) {
+      return Container(
+        height: deviceSize.height / 2,
+        width: deviceSize.width - 100,
+        child: Column(
+          // mainAxisSize: MainAxisSize.min,
+          children: [
+            categoriesBox,
+            Expanded(child: exercisesListTiles),
+            ElevatedButton(
+                style:
+                    ElevatedButton.styleFrom(primary: themeData.primaryColor),
+                onPressed: () {
+                  Navigator.of(context)
+                      .pop(widget.isForSelect ? selectedId : isSelected);
+                },
+                child: const Text('선택완료'))
+          ],
+        ),
+      );
+    } else if (widget.isForFilters) {
+      // * At filters dialog *//
+      return Container(
+        height: deviceSize.height * 0.5,
+        width: deviceSize.width * 0.7,
+        child: Column(
+          children: [
+            categoriesBox,
+            Expanded(child: exercisesListTiles),
+            SizedBox(height: 5),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(primary: themeData.primaryColor),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                width: deviceSize.width * 0.5,
+                child: Center(
+                  child: const Text(
+                    '완료',
+                    style: const TextStyle(fontSize: 15, color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // * At manageScreen *//
+      return Column(
+        children: [
+          categoriesBox,
+          Expanded(child: exercisesListTiles),
+          Divider(),
+          if (widget.isForManage)
+            floatingButton(
+              isBadge: false,
+              text: '운동 추가하기',
+              icon: Icons.add,
+              onPressed: () => showDialog(
+                context: context,
+                builder: (bctx) => ExerciseDialog(true, selectedTargetName),
+                barrierDismissible: true,
+              ),
+            ),
+          if (widget.isForInsert || widget.isForRoutine)
+            floatingButton(
+              isBadge: true,
+              text: '선택 완료',
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (ctx) => InsertEventsScreen(
+                        isRawInsert: true,
+                        isForRoutine: widget.isForRoutine,
+                        exerciseIds: isSelected.entries
+                            .where((entry) => entry.value == true)
+                            .map((entry) => entry.key)
+                            .toList(),
+                      ))),
+            ),
+        ],
+      );
+    }
   }
 
   // ************ categories box ************ //
@@ -114,6 +206,7 @@ class _ExerciseListState extends State<ExerciseList> {
       builder: (ctx, exercises, _) {
         print('build exercisesColumn!');
         final items = exercises.getExercisesByTarget(selectedTargetName);
+        // remove already selected exercises when inserting events
         if (widget.isForAddExtra) {
           items.removeWhere((ex) => widget.alreadySelected.contains(ex.id));
         }
@@ -154,6 +247,7 @@ class _ExerciseListState extends State<ExerciseList> {
         ),
       );
     } else if (widget.isForSelect) {
+      // for select exercise when editing event
       return GestureDetector(
         key: key,
         onTap: () {
@@ -165,7 +259,7 @@ class _ExerciseListState extends State<ExerciseList> {
           color: selectedId == ex.id ? Colors.amber[200] : Colors.white,
           child: ListTile(
             title: Text(ex.name),
-            trailing: selectedId == ex.id ? Icon(Icons.check) : null,
+            trailing: selectedId == ex.id ? const Icon(Icons.check) : null,
           ),
         ),
       );
@@ -202,7 +296,6 @@ class _ExerciseListState extends State<ExerciseList> {
       // for manage screen
       return GestureDetector(
         key: key,
-        // color: Colors.white,
         onTap: () => showDialog(
           context: context,
           builder: (bctx) => ExerciseDialog(false, ex.target.value, id: ex.id),
@@ -234,103 +327,5 @@ class _ExerciseListState extends State<ExerciseList> {
                 .toString(),
           )
         : btn;
-  }
-
-// ************ build widget(exercise list with cartegory) ************ //
-  @override
-  Widget build(BuildContext context) {
-    final deviceSize = MediaQuery.of(context).size;
-    final themeData = Theme.of(context);
-    print('build Exercise List!');
-    // * At exercise dialog by edit event screen & adding extra event *//
-    if (widget.isForSelect || widget.isForAddExtra) {
-      return Container(
-        height: MediaQuery.of(context).size.height / 2,
-        width: MediaQuery.of(context).size.width - 100,
-        child: Column(
-          // mainAxisSize: MainAxisSize.min,
-          children: [
-            categoriesBox,
-            Expanded(child: exercisesListTiles),
-            ElevatedButton(
-                style:
-                    ElevatedButton.styleFrom(primary: themeData.primaryColor),
-                onPressed: () {
-                  Navigator.of(context)
-                      .pop(widget.isForSelect ? selectedId : isSelected);
-                },
-                child: Text('선택완료'))
-          ],
-        ),
-      );
-    } else if (widget.isForFilters) {
-      // * At filters dialog *//
-      return Container(
-        height: deviceSize.height * 0.5,
-        width: deviceSize.width * 0.7,
-        child: Column(
-          // mainAxisSize: MainAxisSize.min,
-          children: [
-            categoriesBox,
-            Expanded(child: exercisesListTiles),
-            SizedBox(height: 5),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Container(
-                width: deviceSize.width * 0.5,
-                child: Center(
-                  child: Text(
-                    '완료',
-                    style: TextStyle(fontSize: 15, color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    } else {
-      // * At manageScreen *//
-      return Column(
-        children: [
-          categoriesBox,
-
-          Expanded(child: exercisesListTiles),
-          Divider(),
-          if (widget.isForManage)
-            floatingButton(
-              isBadge: false,
-              text: '운동 추가하기',
-              icon: Icons.add,
-              onPressed: () => showDialog(
-                context: context,
-                builder: (bctx) => ExerciseDialog(true, selectedTargetName),
-                barrierDismissible: true,
-              ),
-            ),
-
-          if (widget.isForInsert || widget.isForRoutine)
-            floatingButton(
-              isBadge: true,
-              text: '선택 완료',
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (ctx) => InsertEventsScreen(
-                        isRawInsert: true,
-                        isForRoutine: widget.isForRoutine,
-                        exerciseIds: isSelected.entries
-                            .where((entry) => entry.value == true)
-                            .map((entry) => entry.key)
-                            .toList(),
-                      ))),
-            ),
-
-          // ],
-          //   ),
-          // ),
-        ],
-      );
-    }
   }
 }

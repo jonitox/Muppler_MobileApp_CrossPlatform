@@ -1,22 +1,19 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
-import '../screens/edit_event_screen.dart';
 
 import '../providers/events.dart';
 import '../providers/exercises.dart';
 import '../providers/calendar_state.dart';
 import '../providers/filters.dart';
-
+import '../screens/edit_event_screen.dart';
 import '../models/event.dart';
 
+// ************ events list to display ************ //
 class DisplayEvents extends StatelessWidget {
-  final bool isDailyEvents;
-  final bool isTodayEvents;
-  final bool isTrackedEvents;
+  final bool isDailyEvents; // in home screen
+  final bool isTodayEvents; // in calendar screen
+  final bool isTrackedEvents; // in tracking screen
   final String exerciseId;
   DisplayEvents({
     this.isDailyEvents = false,
@@ -24,7 +21,7 @@ class DisplayEvents extends StatelessWidget {
     this.isTrackedEvents = false,
     this.exerciseId,
   });
-// ************ events list to display ************ //
+// ************ build event list ************ //
   @override
   Widget build(BuildContext context) {
     print('build display events!');
@@ -65,7 +62,7 @@ class DisplayEvents extends StatelessWidget {
   }
 }
 
-// ************ events list to display ************ //
+// ************ events tile ************ //
 class EventTile extends StatefulWidget {
   final Event event;
   final Key key;
@@ -78,11 +75,45 @@ class EventTile extends StatefulWidget {
 class _EventTileState extends State<EventTile> {
   bool isHide;
   Exercises exercises;
+  // init state
   @override
   void initState() {
     isHide = true;
     exercises = Provider.of<Exercises>(context, listen: false);
     super.initState();
+  }
+
+  // ************ build event tile ************ //
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+        side: const BorderSide(
+          color: Colors.black38,
+          width: 0.5,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            tileTitle,
+            const Divider(
+              thickness: 1.5,
+            ),
+            if (!isHide) memoBox,
+            eventSummary,
+            const Divider(
+              thickness: 1.5,
+            ),
+            if (!isHide) eventSetDetails,
+          ],
+        ),
+      ),
+    );
   }
 
   // remove fractional parts of double
@@ -93,11 +124,14 @@ class _EventTileState extends State<EventTile> {
   // ************ title of event tile ************ //
   Widget get tileTitle {
     final exercise = exercises.getExercise(widget.event.exerciseId);
+    final themeData = Theme.of(context);
+    final deviceSize = MediaQuery.of(context).size;
     return Row(
       children: [
         Expanded(
           child: Row(
             children: [
+              // hide/reveal button
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -117,6 +151,7 @@ class _EventTileState extends State<EventTile> {
                       )),
                 ],
               ),
+              // date info when tracking
               if (widget.isTracked)
                 Expanded(
                   child: Text(
@@ -133,7 +168,7 @@ class _EventTileState extends State<EventTile> {
                 padding: const EdgeInsets.all(0.5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
-                  side: BorderSide(
+                  side: const BorderSide(
                     color: Colors.black26,
                     width: 1,
                   ),
@@ -141,14 +176,14 @@ class _EventTileState extends State<EventTile> {
                 label: Text(
                   exercise.target.value,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.teal),
+                  style: TextStyle(color: themeData.primaryColor),
                 ),
               ),
               SizedBox(
                 width: 10,
               ),
               Container(
-                width: MediaQuery.of(context).size.width * 0.4,
+                width: deviceSize.width * 0.4,
                 child: Text(
                   exercise.name,
                   overflow: TextOverflow.ellipsis,
@@ -158,9 +193,10 @@ class _EventTileState extends State<EventTile> {
             ],
           ),
         ),
+        // edit button
         if (!widget.isTracked)
           IconButton(
-            icon: Icon(Icons.edit),
+            icon: const Icon(Icons.edit),
             onPressed: () => Navigator.of(context)
                 .pushNamed(EditEventScreen.routeName, arguments: widget.event),
           ),
@@ -190,7 +226,7 @@ class _EventTileState extends State<EventTile> {
             maxLines: 2,
           ),
         ),
-        Divider(
+        const Divider(
           thickness: 1.5,
         ),
       ],
@@ -234,58 +270,7 @@ class _EventTileState extends State<EventTile> {
                 Text('${widget.event.setDetails[idx].rep}회'),
               ],
             ),
-        separatorBuilder: (ctx, i) => Divider(),
+        separatorBuilder: (ctx, i) => const Divider(),
         itemCount: widget.event.setDetails.length);
-  }
-
-  // ************ build event tile ************ //
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-        side: BorderSide(
-          color: Colors.black38,
-          width: 0.5,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            tileTitle,
-
-            Divider(
-              thickness: 1.5,
-            ),
-
-            if (!isHide) memoBox,
-
-            eventSummary,
-
-            Divider(
-              thickness: 1.5,
-            ),
-
-            if (!isHide) eventSetDetails,
-            // ...widget.event.setDetails.asMap().entries.map((entry) {
-            //   final idx = entry.key;
-            //   final s = entry.value;
-            //   return Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //   children: [
-            //     Text('${idx + 1}세트'),
-            //     if (widget.event.type == DetailType.basic)
-            //       Text('${s.weight}Kg'),
-            //     Text('${s.rep}회'),
-            //   ],
-            // );
-            // }).toList(),
-          ],
-        ),
-      ),
-    );
   }
 }

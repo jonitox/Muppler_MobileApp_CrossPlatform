@@ -6,6 +6,7 @@ import '../widgets/exercise_list.dart';
 import '../widgets/display_events.dart';
 import '../widgets/chart.dart';
 
+// ************************** tracking screen ************************* //
 class TrackingScreen extends StatefulWidget {
   static const routeName = '/tracking_screen';
 
@@ -16,8 +17,9 @@ class TrackingScreen extends StatefulWidget {
 class _TrackingScreenState extends State<TrackingScreen> {
   String selectedId;
   Exercises exercises;
-  int bodyIdx;
+  int bodyIdx; // 기록으로보기: index =0 그래프로 보기: index=1
 
+  // initState
   @override
   void initState() {
     bodyIdx = 0;
@@ -25,7 +27,31 @@ class _TrackingScreenState extends State<TrackingScreen> {
     super.initState();
   }
 
-  Widget get nameBox {
+  // ************ build tracking screen ************ //
+  @override
+  Widget build(BuildContext context) {
+    final themeData = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          '성장기록을 확인하세요.',
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            nameBox(themeData),
+            buttonsRow(themeData),
+            contentToShow,
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ************ exercise name box ************ //
+  Widget nameBox(ThemeData themeData) {
     return Row(
       children: [
         Expanded(
@@ -36,7 +62,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                   context: context,
                   builder: (bctx) => AlertDialog(
                     scrollable: true, //
-                    title: Text('운동선택'),
+                    title: const Text('운동선택'),
                     content:
                         ExerciseList(isForSelect: true, selectedId: selectedId),
                   ),
@@ -53,12 +79,14 @@ class _TrackingScreenState extends State<TrackingScreen> {
               child: selectedId == null
                   ? Text(
                       '< 운동 선택 >',
-                      style: TextStyle(color: Colors.teal, fontSize: 18),
+                      style: TextStyle(
+                          color: themeData.primaryColor, fontSize: 18),
                       overflow: TextOverflow.ellipsis,
                     )
                   : Text(
                       '${exercises.getExercise(selectedId).name}',
-                      style: TextStyle(color: Colors.teal, fontSize: 18),
+                      style: TextStyle(
+                          color: themeData.primaryColor, fontSize: 18),
                       overflow: TextOverflow.ellipsis,
                     )),
         )
@@ -66,8 +94,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
     );
   }
 
-  Widget get buttonsRow {
-    final themeData = Theme.of(context);
+  // ************ tab buttons(기록 or 그래프) ************ //
+  Widget buttonsRow(ThemeData themeData) {
     return Row(
       children: [
         Expanded(
@@ -110,11 +138,12 @@ class _TrackingScreenState extends State<TrackingScreen> {
     );
   }
 
+  // ************ content to show(기록 or 그래프) ************ //
   Widget get contentToShow {
     if (selectedId == null) {
       return Expanded(
-        child: Center(
-          child: Text('운동을 선택하세요'),
+        child: const Center(
+          child: const Text('운동을 선택하세요'),
         ),
       );
     } else if (bodyIdx == 0) {
@@ -127,26 +156,5 @@ class _TrackingScreenState extends State<TrackingScreen> {
     } else {
       return Expanded(child: Chart(selectedId));
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '성장기록을 확인하세요.',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            nameBox,
-            buttonsRow,
-            contentToShow,
-          ],
-        ),
-      ),
-    );
   }
 }

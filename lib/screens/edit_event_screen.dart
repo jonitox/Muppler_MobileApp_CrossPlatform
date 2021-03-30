@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/event.dart';
-
 import '../providers/events.dart';
-
 import '../widgets/event_field.dart';
 import '../widgets/custom_floating_button.dart';
+import '../models/event.dart';
 
+// ************************** Edit event screen ************************* //
 class EditEventScreen extends StatefulWidget {
   static const routeName = '/edit_event_screen';
 
@@ -21,6 +20,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
   bool isInit = true;
   final _key = GlobalKey<FormState>();
 
+  // init data
   @override
   void didChangeDependencies() {
     if (isInit) {
@@ -31,10 +31,34 @@ class _EditEventScreenState extends State<EditEventScreen> {
     super.didChangeDependencies();
   }
 
+  // ************ build edit event screen ************ //
   @override
-  void dispose() {
-    print('dispose edit event screen!');
-    super.dispose();
+  Widget build(BuildContext context) {
+    print('build edit event screen!');
+
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text(
+          '운동기록 수정',
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+      body: SafeArea(
+        child: Form(
+          key: _key,
+          child: Column(
+            children: [
+              eventInfoTile,
+              const Divider(
+                color: Colors.black,
+              ),
+              jobCompleteRow,
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   // ************ complete edition ************ //
@@ -48,17 +72,18 @@ class _EditEventScreenState extends State<EditEventScreen> {
     final completeEvents = await showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-              content: Text(
+              content: const Text(
                 '기록을 삭제하시겠습니까?',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               actions: [
                 TextButton(
                     onPressed: () => Navigator.of(context).pop(false),
-                    child: Text('아니오')),
+                    child: const Text('아니오')),
                 TextButton(
                     onPressed: () => Navigator.of(context).pop(true),
-                    child: Text('예')),
+                    child: const Text('예')),
               ],
             ));
     if (!completeEvents) {
@@ -69,7 +94,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
   }
 
   // ************ event tile to edit ************ //
-  Widget get eventInfo {
+  Widget get eventInfoTile {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -80,7 +105,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
             onSaved: (ev) {
               events.updateEvent(event.id, ev.copyWith(id: event.id));
             },
-            validator: (ev) => null,
+            // validator: (ev) => null, // no need to validate..
           ),
         ),
       ),
@@ -89,50 +114,21 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
   // ************ job complete buttons ************ //
   Widget get jobCompleteRow {
-    print('create jobcomplete row!');
+    final themeData = Theme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         CustomFloatingButton(
           name: '수정완료',
           onPressed: onCompleteEdit,
-          color: Colors.teal,
+          color: themeData.primaryColor,
         ),
         CustomFloatingButton(
           name: '기록삭제',
           onPressed: onDeleteEvent,
-          color: Colors.teal,
+          color: themeData.primaryColor,
         ),
       ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    print('build edit event screen!');
-
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(
-          '운동기록 수정',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      body: SafeArea(
-        child: Form(
-          key: _key,
-          child: Column(
-            children: [
-              eventInfo,
-              Divider(
-                color: Colors.black,
-              ),
-              jobCompleteRow,
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

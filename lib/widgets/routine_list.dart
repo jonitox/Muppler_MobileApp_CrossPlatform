@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:work_out_tracker/screens/insert_events_screen.dart';
 
-import '../screens/pick_exercise_only_screen.dart';
-
 import '../providers/exercises.dart';
 import '../providers/routines.dart';
+import '../screens/choose_exs_for_routine_screen.dart';
+import './custom_floating_button.dart';
 import '../models/event.dart';
 import '../models/exercise.dart';
 import '../models/routine.dart';
 
-import './custom_floating_button.dart';
-
+// ************ routine list  ************ //
 class RoutineList extends StatefulWidget {
   final bool isForinsert;
   RoutineList({this.isForinsert = false});
@@ -22,6 +21,36 @@ class RoutineList extends StatefulWidget {
 class _RoutineListState extends State<RoutineList> {
   Routines routines;
   String selectedId;
+
+  // ************ build routine list with buttons ************ //
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        routineTilesList,
+        Divider(),
+        if (widget.isForinsert)
+          floatingButton(
+            text: '선택 완료',
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (ctx) => InsertEventsScreen(
+                        isRawInsert: false,
+                        isForRoutine: false,
+                        routineId: selectedId,
+                      )));
+            },
+          ),
+        if (!widget.isForinsert)
+          floatingButton(
+            text: '루틴 추가하기',
+            onPressed: () => Navigator.of(context)
+                .pushNamed(ChooseExsForRoutineScreen.routeName),
+            icon: Icons.add,
+          ),
+      ],
+    );
+  }
 
   // ************  floating button ************ //
   Widget floatingButton({String text, Function onPressed, IconData icon}) {
@@ -38,8 +67,8 @@ class _RoutineListState extends State<RoutineList> {
       final items = routines.items;
       return Expanded(
         child: items.length == 0
-            ? Center(
-                child: Text(
+            ? const Center(
+                child: const Text(
                 '저장된 루틴이 없습니다.',
                 softWrap: true,
                 style: TextStyle(fontSize: 18),
@@ -76,36 +105,6 @@ class _RoutineListState extends State<RoutineList> {
       );
     });
   }
-
-  // ************ build routine list with buttons ************ //
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        routineTilesList,
-        Divider(),
-        if (widget.isForinsert)
-          floatingButton(
-            text: '선택 완료',
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (ctx) => InsertEventsScreen(
-                        isRawInsert: false,
-                        isForRoutine: false,
-                        routineId: selectedId,
-                      )));
-            },
-          ),
-        if (!widget.isForinsert)
-          floatingButton(
-            text: '루틴 추가하기',
-            onPressed: () => Navigator.of(context)
-                .pushNamed(PickExerciseOnlyScreen.routeName),
-            icon: Icons.add,
-          ),
-      ],
-    );
-  }
 }
 
 // ************  routine tile ************ //
@@ -130,6 +129,32 @@ class _RoutineTileState extends State<RoutineTile> {
     super.initState();
   }
 
+  // ************  build routine tile ************ //
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+        side: const BorderSide(
+          color: Colors.black87,
+          width: 0.5,
+        ),
+      ),
+      color: widget.isSelected ? Colors.amber[200] : null,
+      child: Padding(
+        padding: const EdgeInsets.all(5),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            routineTitleRow,
+            if (!isHide) ...eventsBox,
+          ],
+        ),
+      ),
+    );
+  }
+
   // remove fractional parts of double
   String removeDecimalZeroFormat(String n) {
     return n.replaceAll(RegExp(r"([.]*0)(?!.*\d)"), "");
@@ -139,80 +164,99 @@ class _RoutineTileState extends State<RoutineTile> {
   Widget get routineTitleRow {
     final themeData = Theme.of(context);
     final deviceSize = MediaQuery.of(context).size;
-    return Row(
+    return Column(
       children: [
-        Stack(
-          alignment: Alignment.center,
+        Row(
           children: [
-            IconButton(
-              icon: isHide ? Icon(Icons.expand_more) : Icon(Icons.expand_less),
-              onPressed: () => setState(() {
-                isHide = !isHide;
-              }),
+            // hide/reveal button
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                IconButton(
+                  icon: isHide
+                      ? Icon(Icons.expand_more)
+                      : Icon(Icons.expand_less),
+                  onPressed: () => setState(() {
+                    isHide = !isHide;
+                  }),
+                ),
+                Positioned(
+                    bottom: 1,
+                    child: Text(
+                      isHide ? '펼치기' : '숨기기',
+                      style: TextStyle(fontSize: 12),
+                    )),
+              ],
             ),
-            Positioned(
-                bottom: 1,
+            // routine name
+            Expanded(
                 child: Text(
-                  isHide ? '펼치기' : '숨기기',
-                  style: TextStyle(fontSize: 12),
-                )),
+              widget.r.name,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+            )),
+            if (widget.isForInsert)
+              Icon(widget.isSelected ? Icons.check_outlined : null),
           ],
         ),
-        Expanded(
-            child: Text(
-          widget.r.name,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          overflow: TextOverflow.ellipsis,
-          softWrap: false,
-        )),
-        Text(
-          '총 ${widget.r.items.length}개의 운동 ',
-          style: TextStyle(
-            color: themeData.primaryColor,
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-          ),
+        const Divider(
+          thickness: 1.5,
         ),
-        Text(
-          '총 ${widget.r.numberOfSets}세트 ',
-          style: TextStyle(
-            color: Colors.blueGrey,
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        Text(
-          '볼륨 ${removeDecimalZeroFormat(widget.r.volume.toStringAsFixed(1))}kg',
-          style: TextStyle(
-            color: themeData.accentColor,
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        if (widget.isForInsert)
-          Icon(widget.isSelected ? Icons.check_outlined : null),
+        // routine summary row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              '총 ${widget.r.items.length}개의 운동 ',
+              style: TextStyle(
+                color: themeData.primaryColor,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              '총 세트 수 ${widget.r.numberOfSets} ',
+              style: TextStyle(
+                color: Colors.blueGrey,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              '총 볼륨 ${removeDecimalZeroFormat(widget.r.volume.toStringAsFixed(1))}kg',
+              style: TextStyle(
+                color: themeData.accentColor,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        )
       ],
     );
   }
 
   // ************ events column of routine ************ //
   List<Widget> get eventsBox {
+    // generate events box of routine
     return widget.r.items.map((e) {
       Exercise exercise = exercises.getExercise(e.exerciseId);
       return Column(
         children: [
-          Divider(
+          const Divider(
             thickness: 1.5,
           ),
           Row(
             children: [
+              // target chip
               Chip(
                 backgroundColor:
                     widget.isSelected ? Colors.amber[200] : Colors.white,
                 padding: const EdgeInsets.all(0.5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
-                  side: BorderSide(
+                  side: const BorderSide(
                     color: Colors.black26,
                     width: 1,
                   ),
@@ -223,6 +267,7 @@ class _RoutineTileState extends State<RoutineTile> {
                   style: TextStyle(color: Colors.deepOrange),
                 ),
               ),
+              // exercise name
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -236,11 +281,13 @@ class _RoutineTileState extends State<RoutineTile> {
                   ),
                 ),
               ),
+              // event summary
               Text(
                   '세트 수 ${e.setDetails.length}  볼륨 ${e.type == DetailType.basic ? removeDecimalZeroFormat(e.volume.toStringAsFixed(1)) : e.volume}' +
                       (e.type == DetailType.onlyRep ? '개' : 'kg')),
             ],
           ),
+          // set details
           ListView.builder(
             shrinkWrap: true,
             itemCount: e.setDetails.length,
@@ -259,31 +306,5 @@ class _RoutineTileState extends State<RoutineTile> {
         ],
       );
     }).toList();
-  }
-
-  // ************  build routine tile ************ //
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-        side: BorderSide(
-          color: Colors.black87,
-          width: 0.5,
-        ),
-      ),
-      color: widget.isSelected ? Colors.amber[200] : null,
-      child: Padding(
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            routineTitleRow,
-            if (!isHide) ...eventsBox,
-          ],
-        ),
-      ),
-    );
   }
 }

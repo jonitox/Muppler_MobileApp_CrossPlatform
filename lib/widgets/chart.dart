@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+
 import '../providers/events.dart';
 import '../models/event.dart';
 
+// ************ chart(그래프로 보기) ************ //
 class Chart extends StatelessWidget {
   final String selectedId;
   Chart(this.selectedId);
 
   @override
   Widget build(BuildContext context) {
+    final themeData = Theme.of(context);
     final sortedEvents = Provider.of<Events>(context, listen: false)
         .getTrackedEvents(selectedId);
     if (sortedEvents.length == 0) {
-      return Center(
-        child: Text('기록 없음'),
+      return const Center(
+        child: const Text('기록 없음'),
       );
     }
     final seriesList = [
@@ -36,14 +39,12 @@ class Chart extends StatelessWidget {
         children: [
           Text(
             '볼륨',
-            style: TextStyle(color: Colors.teal),
+            style: TextStyle(color: themeData.primaryColor),
           ),
           Expanded(
             child: charts.TimeSeriesChart(
               seriesList,
               animate: true,
-              // Set the default renderer to a bar renderer.
-              // This can also be one of the custom renderers of the time series chart.
 
               defaultRenderer: charts.BarRendererConfig<DateTime>(),
 
@@ -60,7 +61,7 @@ class Chart extends StatelessWidget {
             alignment: Alignment.bottomLeft,
             child: Text(
               '날짜',
-              style: TextStyle(color: Colors.teal),
+              style: TextStyle(color: themeData.primaryColor),
             ),
           ),
         ],

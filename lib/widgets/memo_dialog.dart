@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// ************ memo dialog  ************ //
 class MemoDialog extends StatefulWidget {
   final String memo;
   final String exerciseName;
@@ -38,7 +39,7 @@ class _MemoDialogState extends State<MemoDialog> {
                 style: TextStyle(fontSize: 18, height: 1),
               ),
             ),
-            Text(
+            const Text(
               '의 메모',
               softWrap: false,
               strutStyle: StrutStyle(
@@ -85,18 +86,20 @@ class _MemoDialogState extends State<MemoDialog> {
                   onSaved: (value) => savedMemo = value,
                 ),
               ),
-              // ************ completition ************ //
+              // ************ completition buttons ************ //
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        primary: themeData.primaryColor),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                     child: Container(
                       width: deviceSize.width * 0.2,
                       child: Center(
-                        child: Text(
+                        child: const Text(
                           '취소',
                           style: TextStyle(fontSize: 15, color: Colors.white),
                         ),
@@ -104,15 +107,16 @@ class _MemoDialogState extends State<MemoDialog> {
                     ),
                   ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        primary: themeData.primaryColor),
                     onPressed: () {
                       _formKey.currentState.save();
-                      print(savedMemo);
                       Navigator.of(context).pop(savedMemo);
                     },
                     child: Container(
                       width: deviceSize.width * 0.2,
                       child: Center(
-                        child: Text(
+                        child: const Text(
                           '저장',
                           style: TextStyle(fontSize: 15, color: Colors.white),
                         ),

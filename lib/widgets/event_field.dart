@@ -1,38 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/exercises.dart';
 import './memo_dialog.dart';
 import './exercise_list.dart';
 import './set_sheet.dart';
-
-import '../providers/exercises.dart';
 import '../models/event.dart';
 import '../models/exercise.dart';
 
-// ************ custom field for event ************ //
+// ************ custom form field for event ************ //
 class EventField extends FormField<Event> {
   EventField({
     FormFieldSetter<Event> onSaved,
     FormFieldValidator<Event> validator,
     Function deleteEvent,
     Event initialValue,
-    bool isEdit,
-    bool isForRoutine = false,
-    // TextEditingController weightController,
-    // TextEditingController repController,
+    bool isEdit = false, // when used on EditEvent Screen
+    bool isForRoutine = false, // when used on making(editing) routine
   }) : super(
           onSaved: onSaved,
           validator: validator,
           initialValue: initialValue,
-          // autovalidate: false, //
           builder: (FormFieldState<Event> state) {
-            print('call builder!');
             return EventFieldBox(
               state,
               isEdit,
               isForRoutine,
               deleteEvent,
-            ); // named로
+            );
           },
         );
 }
@@ -61,26 +56,49 @@ class _EventFieldBoxState extends State<EventFieldBox> {
   Exercise exercise;
   double weightToInsert;
   int repToInsert;
-  List<int> weightPlaceHolder;
-  List<int> repPlaceHolder;
+  List<int> weightPlaceHolder; // for saving weight from dial
+  List<int> repPlaceHolder; // for saving rep from dial
 
+  // init state
   @override
   void initState() {
     event = widget.state.value;
-    weightToInsert =
-        event.setDetails.length == 0 ? 0.0 : event.setDetails.last.weight;
-    repToInsert = event.setDetails.length == 0 ? 0 : event.setDetails.last.rep;
+    weightToInsert = event.setDetails.length == 0
+        ? 0.0
+        : event.setDetails.last.weight; // 마지막 set의 weight
+    repToInsert = event.setDetails.length == 0
+        ? 0
+        : event.setDetails.last.rep; // 마지막 set의 rep
     exercises = Provider.of<Exercises>(context, listen: false);
     isHide = widget.isEdit ? false : true;
-    print('init event field!');
-
     super.initState();
   }
 
+  // dispose
+  // @override
+  // void dispose() {
+  //   print('dispose event field!');
+  //   super.dispose();
+  // }
+
+  // ************ build event field box ************ //
   @override
-  void dispose() {
-    print('dispose event field!');
-    super.dispose();
+  Widget build(BuildContext context) {
+    event = widget.state.value;
+    exercise = exercises.getExercise(event.exerciseId);
+    final themeData = Theme.of(context);
+    print('build event field box!');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        titleRow(themeData),
+        const Divider(
+          thickness: 1.5,
+        ),
+        summaryRow,
+        if (!isHide) hiddenBox(themeData),
+      ],
+    );
   }
 
   // remove fractional parts of double
@@ -107,20 +125,18 @@ class _EventFieldBoxState extends State<EventFieldBox> {
     if (memo == null) {
       return;
     }
-    print('hey');
-    print(memo);
-    // event.memo = memo; // copywith(event)로하려면 필요. // 내부적으로 뭐가 더 나은지? // 사실 copywith로 매번 다시만들어서쓰는거보다 있는 event쓰는게 더 효율적일것같긴함. // 나중에 변경
-    // event.memo = 'aa';
     widget.state.didChange(event.copyWith(memo: memo));
   }
 
   // ************ on Tap Change set row ************ //
+  // 추가할 세트: setnumber =0 실제 세트: setNumber = 1~
   Future<void> onTapSetRow({int setNumber}) async {
     final originWeight = setNumber == 0
         ? weightToInsert
         : event.setDetails[setNumber - 1].weight;
     final originRep =
         setNumber == 0 ? repToInsert : event.setDetails[setNumber - 1].rep;
+    // define place holder of current values
     weightPlaceHolder = List.generate(4, (i) {
       final int rounded = (originWeight * 10).round();
       if (i == 0) {
@@ -178,7 +194,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
       context: context,
       builder: (bctx) => AlertDialog(
         scrollable: true, //
-        title: Text('운동선택'),
+        title: const Text('운동선택'),
         content: ExerciseList(isForSelect: true, selectedId: event.exerciseId),
       ),
     );
@@ -188,10 +204,8 @@ class _EventFieldBoxState extends State<EventFieldBox> {
     widget.state.didChange(event.copyWith(exerciseId: exerciseId));
   }
 
-/////////////////////////////// widgets builders //////////////////////////////////////////
-
   // ************ title Row ************ //
-  Widget get titleRow {
+  Widget titleRow(ThemeData themeData) {
     return Row(
       children: [
         if (!widget.isEdit)
@@ -218,7 +232,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
           padding: const EdgeInsets.all(0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
-            side: BorderSide(
+            side: const BorderSide(
               color: Colors.black26,
               width: 1,
             ),
@@ -226,10 +240,9 @@ class _EventFieldBoxState extends State<EventFieldBox> {
           label: Text(
             exercise.target.value,
             overflow: TextOverflow.ellipsis,
-            // style: TextStyle(color: Colors.teal),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           width: 10,
         ),
         Expanded(
@@ -244,7 +257,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
         if (widget.isEdit)
           ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.teal[300], // background
+                primary: themeData.primaryColor, // background
               ),
               child: Text('운동 변경'),
               onPressed: () => onTapChangeExercise()),
@@ -289,22 +302,22 @@ class _EventFieldBoxState extends State<EventFieldBox> {
   }
 
 // ************ hidden box ************ //
-  Widget get hiddenBox {
+  Widget hiddenBox(ThemeData themeData) {
     final deviceSize = MediaQuery.of(context).size;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Divider(
+        const Divider(
           thickness: 1.5,
         ),
         if (!widget.isForRoutine) memoBox,
-        insertSetRow(deviceSize),
-        Divider(
+        insertSetRow(deviceSize, themeData),
+        const Divider(
           thickness: 1.5,
         ),
         // insertButtonRow,
-        setDetailsColumn(deviceSize),
+        setDetailsColumn(deviceSize, themeData),
       ],
     );
   }
@@ -339,8 +352,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
   }
 
   // ************ insert set row ************ //
-  Widget insertSetRow(Size deviceSize) {
-    final themeData = Theme.of(context);
+  Widget insertSetRow(Size deviceSize, ThemeData themeData) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -350,10 +362,8 @@ class _EventFieldBoxState extends State<EventFieldBox> {
           width: deviceSize.width * 0.2,
           decoration: BoxDecoration(
               color: themeData.accentColor,
-              // border: Border.all(width: 1, color: themeData.accentColor),
               borderRadius: BorderRadius.circular(5)),
           child: PopupMenuButton(
-            // color: themeData.accentColor,
             child: event.type == DetailType.basic
                 ? Center(
                     child:
@@ -377,8 +387,6 @@ class _EventFieldBoxState extends State<EventFieldBox> {
               ),
             ],
             onSelected: (value) {
-              // event.type = value == 0 ? DetailType.basic : DetailType.onlyRep;
-              print(value);
               widget.state.didChange(event.copyWith(
                   type: value == 0 ? DetailType.basic : DetailType.onlyRep));
             },
@@ -391,7 +399,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
               margin: const EdgeInsets.symmetric(horizontal: 10),
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Colors.deepOrange),
+                border: Border.all(width: 1, color: themeData.accentColor),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -403,17 +411,15 @@ class _EventFieldBoxState extends State<EventFieldBox> {
                       children: [
                         Text(
                           '${removeDecimalZeroFormat(weightToInsert.toStringAsFixed(1))}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 22,
-                            // decoration: TextDecoration.underline,
-                            // decorationColor: Colors.bl,
                           ),
                         ),
                         Text(
                           'kg',
                           style: TextStyle(
                             fontSize: 22,
-                            color: Colors.teal,
+                            color: themeData.primaryColorDark,
                           ),
                         ),
                       ],
@@ -424,16 +430,13 @@ class _EventFieldBoxState extends State<EventFieldBox> {
                         '$repToInsert',
                         style: TextStyle(
                           fontSize: 22,
-
-                          // decoration: TextDecoration.underline,
-                          // decorationColor: Colors.teal,
                         ),
                       ),
                       Text(
                         '회',
                         style: TextStyle(
                           fontSize: 22,
-                          color: Colors.teal,
+                          color: themeData.primaryColorDark,
                         ),
                       ),
                     ],
@@ -466,14 +469,14 @@ class _EventFieldBoxState extends State<EventFieldBox> {
   }
 
   // ************ set details column  ************ //
-  Widget setDetailsColumn(Size deviceSize) {
+  Widget setDetailsColumn(Size deviceSize, ThemeData themeData) {
     return event.setDetails.length == 0
         ? Container(
             height: 30,
             child: Center(
               child: Text(
                 '세트 없음',
-                style: TextStyle(color: Colors.deepOrange[300]),
+                style: TextStyle(color: themeData.accentColor),
               ),
             ),
           )
@@ -484,19 +487,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
             itemBuilder: (ctx, i) => Row(
               key: ValueKey('set#$i'),
               children: [
-                // *미추가: 세트 성공 여부 기능
-                // Container(
-                //   width: deviceSize.width * 0.1,
-                //   child: FittedBox(
-                //     fit: BoxFit.fitWidth,
-                //     child: OutlinedButton(
-                //       onPressed: () {},
-                //       child: Text('완료'),
-                //     ),
-                //   ),
-                // ),
                 Container(
-                  // color: Colors.red,
                   width: deviceSize.width * 0.2,
                   child: Center(
                       child: Text(
@@ -511,7 +502,7 @@ class _EventFieldBoxState extends State<EventFieldBox> {
                       margin: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
                         border:
-                            Border.all(width: 1, color: Colors.deepOrange[300]),
+                            Border.all(width: 1, color: themeData.accentColor),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -530,7 +521,6 @@ class _EventFieldBoxState extends State<EventFieldBox> {
                               )),
                             ),
                           Container(
-                            // color: Colors.red,
                             width: deviceSize.width * 0.2,
                             child: Center(
                                 child: Text(
@@ -547,7 +537,6 @@ class _EventFieldBoxState extends State<EventFieldBox> {
                   ),
                 ),
                 Container(
-                  // color: Colors.blue,
                   width: deviceSize.width * 0.07,
                   child: FittedBox(
                     fit: BoxFit.fitWidth,
@@ -564,24 +553,5 @@ class _EventFieldBoxState extends State<EventFieldBox> {
               ],
             ),
           );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    event = widget.state.value;
-    exercise = exercises.getExercise(event.exerciseId);
-
-    print('build event field box!');
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        titleRow,
-        Divider(
-          thickness: 1.5,
-        ),
-        summaryRow,
-        if (!isHide) hiddenBox,
-      ],
-    );
   }
 }

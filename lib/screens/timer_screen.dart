@@ -1,12 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/stopwatch_state.dart';
 import '../providers/lap_times.dart';
 
+// ************************** timer screen ************************* //
 class TimerScreen extends StatelessWidget {
   static const routeName = 'timer_screen';
+  // ************ build timer screen ************ //
+  @override
+  Widget build(BuildContext context) {
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final themeData = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          '스탑워치',
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+      body: Consumer<StopWatchState>(
+        builder: (ctx, stopwatch, ch) => stopwatch.isOnOverlay
+            ? Center(
+                child: const Text(
+                  '이제 타이머를 다른 화면에서 사용할수 있습니다!',
+                  style: const TextStyle(fontSize: 17),
+                  softWrap: true,
+                ),
+              )
+            : Column(
+                children: [
+                  if (!stopwatch.isOnOverlay)
+                    defaultTimerBox(context, stopwatch, deviceWidth, themeData),
+                  ch,
+                ],
+              ),
+        child: lapTimeRows(deviceWidth),
+      ),
+    );
+  }
 
   // ************ on add overlay  ************ //
   static void swtichToOverlay(BuildContext ctx) {
@@ -20,6 +52,7 @@ class TimerScreen extends StatelessWidget {
         right: 5,
         child: Consumer<StopWatchState>(
           builder: (bctx, stopwatch, _) {
+            // widget(entry) to overlayed
             return Container(
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
@@ -31,7 +64,7 @@ class TimerScreen extends StatelessWidget {
                 children: [
                   timeBox(deviceSize.width, stopwatch, themeData),
                   startAndPauseButton(stopwatch),
-                  SizedBox(
+                  const SizedBox(
                     height: 3,
                   ),
                   resetAndShutOverlayButton(
@@ -119,24 +152,23 @@ class TimerScreen extends StatelessWidget {
   }
 
   // ************  reset/addLap button ************ //
-  Widget resetAndRecordButton(StopWatchState stopwatch) {
-    return Consumer<LapTimes>(
-      builder: (ctx, laptimes, _) => FloatingActionButton(
-          backgroundColor: stopwatch.isOn
-              ? (stopwatch.isRunning ? Colors.lime[900] : Colors.red[400])
-              : Colors.grey,
-          heroTag: 'btn1',
-          onPressed: stopwatch.isOn
-              ? () {
-                  if (stopwatch.isRunning) {
-                    laptimes.addLap(stopwatch.getTime);
-                  } else {
-                    laptimes.clearLaps();
-                    stopwatch.reset();
-                  }
-                }
-              : null,
-          child: Text(stopwatch.isRunning ? '랩타임' : '초기화')),
+  Widget resetAndRecordButton(StopWatchState stopwatch, LapTimes laptimes) {
+    return FloatingActionButton(
+      backgroundColor: stopwatch.isOn
+          ? (stopwatch.isRunning ? Colors.lime[900] : Colors.red[400])
+          : Colors.grey,
+      heroTag: 'btn1',
+      onPressed: stopwatch.isOn
+          ? () {
+              if (stopwatch.isRunning) {
+                laptimes.addLap(stopwatch.getTime);
+              } else {
+                laptimes.clearLaps();
+                stopwatch.reset();
+              }
+            }
+          : null,
+      child: Text(stopwatch.isRunning ? '랩타임' : '초기화'),
     );
   }
 
@@ -193,6 +225,7 @@ class TimerScreen extends StatelessWidget {
   // ************  default stop watch box, that is not on overlay ************ //
   Widget defaultTimerBox(BuildContext ctx, StopWatchState stopwatch,
       double deviceWidth, ThemeData themeData) {
+    final laptimes = Provider.of<LapTimes>(ctx, listen: false);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -201,12 +234,12 @@ class TimerScreen extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            resetAndRecordButton(stopwatch),
+            resetAndRecordButton(stopwatch, laptimes),
             startAndPauseButton(stopwatch),
             separateToOverlayButton(ctx, stopwatch),
           ],
         ),
-        Divider(
+        const Divider(
           height: 80,
           thickness: 2,
         ),
@@ -223,7 +256,7 @@ class TimerScreen extends StatelessWidget {
         return Expanded(
           child: ListView.separated(
             itemCount: itemCnt,
-            separatorBuilder: (ctx, i) => Divider(),
+            separatorBuilder: (ctx, i) => const Divider(),
             itemBuilder: (ctx, i) => Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               key: ValueKey('랩#$i'),
@@ -246,7 +279,7 @@ class TimerScreen extends StatelessWidget {
                         child: Center(
                           child: Text(
                             items[i]['min'],
-                            style: TextStyle(fontSize: 20),
+                            style: const TextStyle(fontSize: 20),
                           ),
                         ),
                       ),
@@ -256,7 +289,7 @@ class TimerScreen extends StatelessWidget {
                         child: Center(
                           child: Text(
                             ':',
-                            style: TextStyle(fontSize: 20),
+                            style: const TextStyle(fontSize: 20),
                           ),
                         ),
                       ),
@@ -266,7 +299,7 @@ class TimerScreen extends StatelessWidget {
                         child: Center(
                           child: Text(
                             items[i]['sec'],
-                            style: TextStyle(fontSize: 20),
+                            style: const TextStyle(fontSize: 20),
                           ),
                         ),
                       ),
@@ -276,7 +309,7 @@ class TimerScreen extends StatelessWidget {
                         child: Center(
                           child: Text(
                             '.',
-                            style: TextStyle(fontSize: 20),
+                            style: const TextStyle(fontSize: 20),
                           ),
                         ),
                       ),
@@ -286,7 +319,7 @@ class TimerScreen extends StatelessWidget {
                         child: Center(
                           child: Text(
                             items[i]['msec'],
-                            style: TextStyle(fontSize: 20),
+                            style: const TextStyle(fontSize: 20),
                           ),
                         ),
                       ),
@@ -298,37 +331,6 @@ class TimerScreen extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
-    final themeData = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '스탑워치',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      body: Consumer<StopWatchState>(
-        builder: (ctx, stopwatch, ch) => stopwatch.isOnOverlay
-            ? Center(
-                child: Text(
-                  '이제 타이머를 다른 화면에서 사용할수 있습니다!',
-                  style: TextStyle(fontSize: 15),
-                ),
-              )
-            : Column(
-                children: [
-                  if (!stopwatch.isOnOverlay)
-                    defaultTimerBox(context, stopwatch, deviceWidth, themeData),
-                  ch,
-                ],
-              ),
-        child: lapTimeRows(deviceWidth),
-      ),
     );
   }
 }

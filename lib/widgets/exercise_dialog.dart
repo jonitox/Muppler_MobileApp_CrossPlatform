@@ -8,6 +8,7 @@ import '../providers/routines.dart';
 
 import '../models/exercise.dart';
 
+// ************ exercise dialog ************ //
 class ExerciseDialog extends StatefulWidget {
   final String id;
   final bool isInsert;
@@ -24,9 +25,9 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
   Exercises exercises;
   Exercise exercise;
   Filters filters;
+  // init state
   @override
   void initState() {
-    // dialog인데 dispose되는지? // 그냥 sate내 변수(위)에 직접
     selectedTargetName =
         widget.targetName == '전체' ? Target.chest : widget.targetName;
     exercises = Provider.of<Exercises>(context, listen: false);
@@ -37,12 +38,54 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
     super.initState();
   }
 
+  // ************ build exercise dialog ************ //
+  @override
+  Widget build(BuildContext context) {
+    final themeData = Theme.of(context);
+    return AlertDialog(
+      scrollable: true,
+      title: Column(
+        children: [
+          Text(
+            widget.isInsert ? '새로운 운동 추가' : '운동 정보 수정',
+            style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w500),
+          ),
+          Divider(
+            height: 20,
+            thickness: 0.8,
+            color: themeData.primaryColor, // theme
+          ),
+        ],
+      ),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            const Text(
+              '카테고리 선택',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+            categoryChips(themeData),
+            const Divider(
+              color: Colors.black,
+            ),
+            nameBox,
+            jobCompleteRow(themeData),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ************ save/update exercise ************ //
   void _onSave(String name) {
     if (widget.isInsert) {
+      // add new exercise
       String id = exercises.addExercise(name, Target(selectedTargetName));
       filters.addFilter(id);
     } else {
+      // update exercise
       exercises.updateExercise(
           widget.id, Exercise(widget.id, name, Target(selectedTargetName)));
     }
@@ -53,17 +96,17 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
     final isSure = await showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-              content: Text(
-                '운동을 삭제하시겠습니까?\n해당 운동의 기록 및 운동을 포함하는 루틴이 모두 삭제됩니다.',
+              content: const Text(
+                '운동을 삭제하시겠습니까?\n이 운동의 기록 및 운동을 포함하는 루틴이 모두 삭제됩니다.',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               actions: [
                 TextButton(
                     onPressed: () => Navigator.of(context).pop(false),
-                    child: Text('아니오')),
+                    child: const Text('아니오')),
                 TextButton(
                     onPressed: () => Navigator.of(context).pop(true),
-                    child: Text('예')),
+                    child: const Text('예')),
               ],
             ));
     if (!isSure) {
@@ -73,14 +116,13 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
         .deleteEventsOfExercise(widget.id);
     final routineIds = Provider.of<Routines>(context, listen: false)
         .deleteRoutinesOfExercise(widget.id);
-    print(routineIds.length);
     exercises.deleteExercise(widget.id, eventIds, routineIds);
     filters.deleteFilter(widget.id);
     Navigator.of(context).pop();
   }
 
   // ************ category chips ************ //
-  Widget get categoryChips {
+  Widget categoryChips(ThemeData themeData) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -91,7 +133,7 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
                 // border, clip
                 child: Chip(
                   backgroundColor: selectedTargetName == t
-                      ? Colors.deepOrange
+                      ? themeData.accentColor
                       : Colors.grey[300],
                   label: Text(
                     t,
@@ -117,6 +159,8 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
   Widget get nameBox {
     return TextFormField(
       initialValue: widget.isInsert ? null : exercise.name,
+      enableSuggestions: false,
+      autocorrect: false,
       decoration: const InputDecoration(
         hintText: '종목의 이름을 입력하세요',
       ),
@@ -131,7 +175,7 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
   }
 
   // ************ JobCompleteRow ************ //
-  Widget get jobCompleteRow {
+  Widget jobCompleteRow(ThemeData themeData) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Row(
@@ -139,7 +183,7 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
         children: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              primary: Colors.teal[300], // background
+              primary: themeData.primaryColor, // background
             ),
             onPressed: () {
               if (_formKey.currentState.validate()) {
@@ -152,51 +196,12 @@ class _ExerciseDialogState extends State<ExerciseDialog> {
           if (!widget.isInsert)
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.teal[300], // background
+                primary: themeData.primaryColor, // background
               ),
               onPressed: _onDelete,
-              child: Text('운동 삭제'),
+              child: const Text('운동 삭제'),
             ),
         ],
-      ),
-    );
-  }
-
-  // build exercise dialog ************ //
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      scrollable: true,
-      title: Column(
-        children: [
-          Text(
-            widget.isInsert ? '새로운 운동 추가' : '운동 정보 수정',
-            style: TextStyle(fontSize: 23, fontWeight: FontWeight.w500),
-          ),
-          Divider(
-            height: 20,
-            thickness: 0.8,
-            color: Theme.of(context).primaryColor, // theme
-          ),
-        ],
-      ),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              '카테고리 선택',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            categoryChips,
-            Divider(
-              color: Colors.black,
-            ),
-            nameBox,
-            jobCompleteRow,
-          ],
-        ),
       ),
     );
   }

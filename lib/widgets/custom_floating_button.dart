@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// ************ custom floatting button with outline ************ //
 class CustomFloatingButton extends StatelessWidget {
   final String name;
   final IconData icon;
@@ -9,7 +10,6 @@ class CustomFloatingButton extends StatelessWidget {
   CustomFloatingButton(
       {this.name, this.icon, this.onPressed, this.color = Colors.deepOrange});
 
-  // ************ custom floatting button with outline ************ //
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+// ************ set sheet  ************ //
 class SetSheet extends StatefulWidget {
   final List<int> weightHolder;
   final List<int> repHolder;
@@ -20,18 +21,24 @@ class SetSheet extends StatefulWidget {
 }
 
 class _SetSheetState extends State<SetSheet> {
-  List<FixedExtentScrollController> _scrollControllers;
+  List<FixedExtentScrollController>
+      _scrollControllers; // scrollController for picker
   final nums = List.generate(
-          10,
-          (i) =>
-              FittedBox(fit: BoxFit.contain, child: Center(child: Text('$i'))))
-      .toList();
+      10,
+      (i) => FittedBox(
+          fit: BoxFit.contain,
+          child: Center(
+              child: Text(
+            '$i',
+          )))).toList();
 
+  // init State
   @override
   void initState() {
     _scrollControllers = List.generate(
       widget.isOnlyRep ? 3 : 7,
       (i) => FixedExtentScrollController(
+        // set initial item of controller(for each picker)
         initialItem: widget.isOnlyRep
             ? widget.repHolder[i]
             : (i < 4 ? widget.weightHolder[i] : widget.repHolder[i - 4]),
@@ -40,16 +47,36 @@ class _SetSheetState extends State<SetSheet> {
     super.initState();
   }
 
+  // dispose
   @override
   void dispose() {
     _scrollControllers.forEach((sc) => sc.dispose());
     super.dispose();
   }
 
+  // ************ build set dial for bottom sheet ************ //
+  @override
+  Widget build(BuildContext context) {
+    final mediaData = MediaQuery.of(context);
+
+    return Container(
+      height: mediaData.size.height / 6,
+      padding: EdgeInsets.only(bottom: mediaData.padding.bottom),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (!widget.isOnlyRep) weightPickerRow(mediaData),
+          SizedBox(width: mediaData.size.width / 25),
+          repPickerRow(mediaData),
+        ],
+      ),
+    );
+  }
+
   // ************ digit picker ************ //
   Widget picker(MediaQueryData mediaData, int idx) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: mediaData.size.height / 30),
+      margin: EdgeInsets.symmetric(vertical: mediaData.size.height / 40),
       width: mediaData.size.width / 10,
       decoration: BoxDecoration(
         border: Border.all(width: 1, color: Colors.grey),
@@ -57,7 +84,6 @@ class _SetSheetState extends State<SetSheet> {
       ),
       child: CupertinoPicker(
         scrollController: _scrollControllers[idx],
-        // backgroundColor: Colors.white,
         children: nums,
         itemExtent: mediaData.size.height / 20,
         looping: false,
@@ -81,7 +107,6 @@ class _SetSheetState extends State<SetSheet> {
           '.',
           style: TextStyle(
             fontSize: 50,
-            // color: Colors.teal,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -90,7 +115,6 @@ class _SetSheetState extends State<SetSheet> {
           'kg',
           style: TextStyle(
             fontSize: 30,
-            // color: Colors.teal,
           ),
         ),
       ],
@@ -109,30 +133,9 @@ class _SetSheetState extends State<SetSheet> {
           '회',
           style: TextStyle(
             fontSize: 30,
-            fontWeight: FontWeight.bold,
-            // color: Colors.teal,
           ),
         ),
       ],
-    );
-  }
-
-  // ************ build set dial for bottom sheet ************ //
-  @override
-  Widget build(BuildContext context) {
-    final mediaData = MediaQuery.of(context);
-
-    return Container(
-      height: mediaData.size.height / 7,
-      padding: EdgeInsets.only(bottom: mediaData.padding.bottom),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (!widget.isOnlyRep) weightPickerRow(mediaData),
-          SizedBox(width: mediaData.size.width / 25),
-          repPickerRow(mediaData),
-        ],
-      ),
     );
   }
 }

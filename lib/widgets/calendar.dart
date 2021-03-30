@@ -6,12 +6,12 @@ import '../providers/events.dart';
 import '../providers/filters.dart';
 import '../providers/calendar_state.dart';
 
+// ************ calendar ************ //
 class Calendar extends StatelessWidget {
   final CalendarController calendarController;
 
   Calendar(this.calendarController);
 
-  // ************ calendar ************ //
   @override
   Widget build(BuildContext context) {
     print('build Calendar!');
@@ -37,14 +37,12 @@ class Calendar extends StatelessWidget {
       /// calendarStyle
       calendarStyle: CalendarStyle(
         outsideDaysVisible: true,
-        // outsideStyle: ,
         outsideWeekendStyle: TextStyle().copyWith(
           color: const Color(4288585374),
         ),
         selectedColor: themeData.accentColor,
         todayColor: themeData.primaryColor.withOpacity(0.7),
         weekendStyle: TextStyle().copyWith(color: const Color(4288585374)),
-        // holidayStyle: TextStyle().copyWith(color: Colors.blue[800]),
       ),
 
       ///  daysOfWeekStyle
@@ -109,8 +107,6 @@ class Calendar extends StatelessWidget {
         currentState.setDay(date);
         // _animationController.forward(from: 0.0);
       },
-      // onCalendarCreated: _onCalendarCreated,
-      // onVisibleDaysChanged: _onVisibleDaysChanged,
     );
   }
 

@@ -1,30 +1,29 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:work_out_tracker/providers/stopwatch_state.dart';
 
-import '../models/event.dart';
-
-import './timer_screen.dart';
-import '../models/routine.dart';
-import '../widgets/event_field.dart';
-import '../widgets/custom_floating_button.dart';
-import '../widgets/exercise_list.dart';
+import '../providers/stopwatch_state.dart';
 import '../providers/routines.dart';
 import '../providers/events.dart';
 import '../providers/calendar_state.dart';
+import './timer_screen.dart';
+import '../widgets/event_field.dart';
+import '../widgets/custom_floating_button.dart';
+import '../widgets/exercise_list.dart';
+import '../models/event.dart';
+import '../models/routine.dart';
 
+// ************************** Insert event screen ************************* //
 class InsertEventsScreen extends StatefulWidget {
-  final bool isRawInsert;
-  final bool isForRoutine;
-  // final bool isEditRoutine; // 이걸로 변경.
-  final String routineId; // id로 받아서 routines에서 get?
+  final bool
+      isRawInsert; // isRawInsert: 운동목록 직접 선택해 get(true) / 루틴으로부터 목록 get(false)
+  final bool isForRoutine; // isForRoutine: 루틴 생성 혹은 수정(true) / 운동 기록 추가(false)
+  final String routineId;
   final List<String> exerciseIds;
 
   InsertEventsScreen({
-    @required this.isRawInsert,
+    this.isRawInsert = false,
     this.isForRoutine = false,
     this.exerciseIds,
     this.routineId,
@@ -43,19 +42,22 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
   Routine routine;
   ScrollController _scrollController;
 
+  // init state
   @override
   void initState() {
     routines = Provider.of<Routines>(context, listen: false);
     if (!widget.isRawInsert) {
-      routine = routines.getRoutine(widget.routineId);
+      routine = routines.getRoutine(widget.routineId); // 운동 목록 get from routine
     } else if (widget.isForRoutine) {
-      routine = Routine();
+      routine = Routine(); // 루틴 생성 + 목록 직접 선택
     }
     if (!widget.isForRoutine) {
-      day = Provider.of<CalendarState>(context, listen: false).day;
+      day = Provider.of<CalendarState>(context, listen: false)
+          .day; // 운동 기록 추가시 get selectedDay
     }
     _itemCount =
         widget.isRawInsert ? widget.exerciseIds.length : routine.items.length;
+    // 목록 타일 generate
     events = List.generate(
       _itemCount,
       (i) => widget.isRawInsert
@@ -76,23 +78,114 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
     super.initState();
   }
 
+  // dispose
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
 
-  // ************ choose extra exercises to add ************ //
+  // ******************** build insert events screen ******************** //
+  @override
+  Widget build(BuildContext context) {
+    print('build Insert Events Screen!');
+    final stopwatch = Provider.of<StopWatchState>(context);
+    final themeData = Theme.of(context);
+    // appBar of Insert Event screen
+    final _appBar = AppBar(
+      title: widget.isForRoutine
+          ? (widget.isRawInsert
+              ? FittedBox(
+                  child: Text(
+                    '루틴을 구성하세요',
+                    style: themeData.appBarTheme.titleTextStyle,
+                  ),
+                )
+              : FittedBox(
+                  child: Text(
+                    '루틴을 수정하세요',
+                    style: themeData.appBarTheme.titleTextStyle,
+                  ),
+                ))
+          : FittedBox(
+              child: Text(
+              '추가: ${DateFormat('M월 d일').format(day)}의 운동',
+              style: themeData.appBarTheme.titleTextStyle,
+            )),
+      // dismiss leading button
+      automaticallyImplyLeading:
+          widget.isForRoutine && !widget.isRawInsert ? false : true,
+      // buttons for stopwatch & add extra Exs
+      actions: [
+        if (!widget.isForRoutine)
+          IconButton(
+              color: Colors.white,
+              icon: const Icon(Icons.timer_outlined),
+              onPressed: stopwatch.isOnOverlay
+                  ? null
+                  : () {
+                      stopwatch.switchOverlay();
+                      TimerScreen.swtichToOverlay(context);
+                    }),
+        // add extra event
+        GestureDetector(
+          onTap: _onAddExtra,
+          child: Container(
+            margin: const EdgeInsets.only(right: 10),
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: _appBar,
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () {
+            if (Platform.isIOS) {
+              FocusScopeNode currentFocus = FocusScope.of(context);
+              if (!currentFocus.hasPrimaryFocus &&
+                  currentFocus.focusedChild != null) {
+                FocusManager.instance.primaryFocus.unfocus();
+              }
+            }
+          },
+          child: Form(
+            key: _key,
+            child: Column(
+              children: [
+                if (widget.isForRoutine || !widget.isRawInsert) routineTitleBox,
+                Expanded(child: eventTilesList),
+                const Divider(
+                  color: Colors.black,
+                ),
+                if (events.length > 1) reorderTipBox,
+                jobCompleteRow(themeData),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ************ on choose extra exercises ************ //
   Future<void> _onAddExtra() async {
     final selectedExtras = await showDialog(
       barrierDismissible: true,
       context: context,
       builder: (bctx) => AlertDialog(
-        scrollable: true, //
-        title: Text('종목 추가하기'),
+        scrollable: true,
+        title: const Text('종목 추가하기'),
         content: ExerciseList(
           isForAddExtra: true,
-          alreadySelected: events.map((e) => e.exerciseId).toList(),
+          alreadySelected:
+              events.map((e) => e.exerciseId).toList(), // already included
         ),
       ),
     ) as Map<String, bool>;
@@ -102,7 +195,6 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
     setState(() {
       selectedExtras.forEach((key, value) {
         if (value == true) {
-          print('hey');
           events.add(Event(
               id: null,
               date: widget.isForRoutine ? null : day,
@@ -112,7 +204,7 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
     });
   }
 
-  // ************ save events or Routine ************ //
+  // ************ save events or complete making Routine ************ //
   Future<void> _onSave() async {
     if (!_key.currentState.validate()) {
       return;
@@ -128,6 +220,7 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
             id: widget.routineId, name: routine.name, events: events);
       }
     } else {
+      // insert events(운동 종료)
       final completeEvents = await showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
@@ -193,22 +286,23 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
     });
   }
 
-  // ************ delete routine ************ //
+// ************ delete routine ************ //
   Future<void> _onDeleteRoutine() async {
     final isSure = await showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-              content: Text(
+              content: const Text(
                 '루틴을 삭제하시겠습니까?',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               actions: [
                 TextButton(
                     onPressed: () => Navigator.of(context).pop(false),
-                    child: Text('아니오')),
+                    child: const Text('아니오')),
                 TextButton(
                     onPressed: () => Navigator.of(context).pop(true),
-                    child: Text('예')),
+                    child: const Text('예')),
               ],
             ));
     if (!isSure) {
@@ -227,9 +321,9 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
       ),
       child: Row(
         children: [
-          Text(
+          const Text(
             '루틴 ',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
             ),
           ),
@@ -240,14 +334,13 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
                     enableSuggestions: false,
                     autocorrect: false,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    // textInputAction: TextInputAction.done,
                     decoration: InputDecoration(hintText: '이름을 입력하세요.'),
                     onSaved: (value) {
-                      routine.name = value; // ?
+                      routine.name = value;
                     },
                     validator: (value) {
                       if (value.trim().length == 0) {
-                        return '이름이 없습니다.';
+                        return '이름이 없습니다.'; // hint for validate fail
                       }
                       return null;
                     },
@@ -266,12 +359,11 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
 
   // ************ event tiles list ************ //
   Widget get eventTilesList {
-    print('build reorderalbe!');
     return ReorderableList(
       controller: _scrollController,
       shrinkWrap: true,
+      // reorder logic
       onReorder: (oldIdx, newIdx) {
-        print('call reorder!');
         setState(() {
           if (newIdx > oldIdx) {
             newIdx -= 1;
@@ -292,7 +384,7 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
           elevation: 3,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
-            side: BorderSide(
+            side: const BorderSide(
               color: Colors.black38,
               width: 0.5,
             ),
@@ -307,7 +399,7 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
               onSaved: (ev) {
                 events[i] = ev;
               },
-              validator: (ev) => null,
+              // validator: (ev) => null, // no need to validate..
             ),
           ),
         ),
@@ -326,20 +418,20 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            '타일을 길게 누르면 운동 순서를 변경할수 있습니다.',
+          const Text(
+            '타일을 길게 눌러 운동 순서를 변경할수 있습니다.',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             softWrap: true,
           ),
-          Divider(),
+          const Divider(),
         ],
       ),
     );
   }
 
   // ************ job complete buttons ************ //
-  Widget get jobCompleteRow {
+  Widget jobCompleteRow(ThemeData themeData) {
     print('create jobcomplete row!');
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -349,106 +441,15 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
               ? '운동기록 저장'
               : (widget.isRawInsert ? '루틴 저장하기' : '수정완료'),
           onPressed: _onSave,
-          color: Colors.teal,
+          color: themeData.primaryColor,
         ),
         if (widget.isForRoutine && !widget.isRawInsert)
           CustomFloatingButton(
             name: '루틴삭제',
             onPressed: _onDeleteRoutine,
-            color: Colors.teal,
+            color: themeData.primaryColor,
           ),
       ],
-    );
-  }
-
-  // ************ build insert events screen ************ //
-  @override
-  Widget build(BuildContext context) {
-    print('build Insert Events Screen!');
-    final stopwatch = Provider.of<StopWatchState>(context);
-    // appBar of Insert Event screen
-    final _appBar = AppBar(
-      title: widget.isForRoutine
-          ? (widget.isRawInsert
-              ? Text(
-                  '루틴을 구성하세요.',
-                  style: TextStyle(color: Colors.white),
-                )
-              : Text(
-                  '루틴을 수정하세요.',
-                  style: TextStyle(color: Colors.white),
-                ))
-          : FittedBox(
-              child: Text(
-              '추가: ${DateFormat('M월 d일').format(day)}의 운동',
-              style: TextStyle(color: Colors.white),
-            )),
-      automaticallyImplyLeading:
-          widget.isForRoutine && !widget.isRawInsert ? false : true,
-      actions: [
-        if (!widget.isForRoutine)
-          IconButton(
-              color: Colors.white,
-              icon: Icon(Icons.timer_outlined),
-              onPressed: stopwatch.isOnOverlay
-                  ? null
-                  : () {
-                      stopwatch.switchOverlay();
-                      TimerScreen.swtichToOverlay(context);
-                    }),
-        // add extra event
-        GestureDetector(
-          onTap: _onAddExtra,
-          child: Container(
-            margin: const EdgeInsets.only(right: 10
-                // vertical: 5,
-                ),
-            // padding: const EdgeInsets.all(8),
-            // decoration: BoxDecoration(
-            //   shape: BoxShape.circle,
-            //   border: Border.all(width: 1, color: Colors.white),
-            // ),
-            // child: Center(
-            child: Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-          ),
-          // ),
-        ),
-      ],
-    );
-
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: _appBar,
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () {
-            if (Platform.isIOS) {
-              FocusScopeNode currentFocus = FocusScope.of(context);
-              if (!currentFocus.hasPrimaryFocus &&
-                  currentFocus.focusedChild != null) {
-                FocusManager.instance.primaryFocus.unfocus();
-              }
-            }
-          },
-          child: Form(
-            key: _key,
-            child: Column(
-              children: [
-                if (widget.isForRoutine || !widget.isRawInsert) routineTitleBox,
-                Expanded(child: eventTilesList),
-                Divider(
-                  color: Colors.black,
-                ),
-                if (events.length > 1) reorderTipBox,
-                jobCompleteRow,
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
