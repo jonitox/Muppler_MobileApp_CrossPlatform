@@ -15,7 +15,7 @@ class _ManageScreenState extends State<ManageScreen> {
   // ************ build manage screen ************ //
   @override
   Widget build(BuildContext context) {
-    print('build ManageScreen!');
+    // print('build ManageScreen!');
     return Column(
       children: [
         Row(

@@ -14,12 +14,12 @@ class Calendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('build Calendar!');
+    // print('build Calendar!');
     final themeData = Theme.of(context);
     final events = Provider.of<Events>(context);
     final filter = Provider.of<Filters>(context);
     final currentState = Provider.of<CalendarState>(context);
-    print(events.getItemsForCalendar(filter.items));
+    // print(events.getItemsForCalendar(filter.items));
     return TableCalendar(
       locale: 'ko_KR',
       calendarController: calendarController,
@@ -112,8 +112,8 @@ class Calendar extends StatelessWidget {
 
   // ************ events marker ************ //
   Widget _buildEventsMarker(DateTime date, List events) {
-    print('$events');
-    print('${date.toString()}');
+    // print('$events');
+    // print('${date.toString()}');
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(

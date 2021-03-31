@@ -65,7 +65,7 @@ class FuncionsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(width: 1, color: themeData.accentColor),
+                border: Border.all(width: 1, color: Colors.deepOrange),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -74,7 +74,7 @@ class FuncionsScreen extends StatelessWidget {
                     buttonInfo,
                     style: TextStyle(
                       fontWeight: FontWeight.w400,
-                      color: themeData.accentColor,
+                      color: Colors.deepOrange,
                     ),
                   ),
                   Icon(

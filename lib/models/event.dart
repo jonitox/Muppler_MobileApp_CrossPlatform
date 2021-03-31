@@ -53,7 +53,6 @@ class Event {
   }
 
   void removeSet(int idx) {
-    print('remove $idx !');
     setDetails.removeAt(idx);
   }
 
@@ -70,9 +69,6 @@ class Event {
   }
 
   Map<String, dynamic> eventToMap() {
-    print('call eventToMap!');
-    print(id);
-    // dynamic?
     // id TEXT PRIMARY KEY, exerciseId TEXT, memo TEXT, date TEXT, type INTEGER
     return {
       'id': id,
@@ -84,15 +80,12 @@ class Event {
   }
 
   List<Map<String, dynamic>> setsToList() {
-    print('call setsToList!');
-    print(id);
-    // id INTEGER PRIMARY KEY, eventId TEXT, setNumber INTEGER, weight REAL, repetition INTEGER
+    // id INTEGER PRIMARY KEY, eventId TEXT, weight REAL, repetition INTEGER
     return setDetails.asMap().entries.map((entry) {
       final i = entry.key;
       final s = entry.value;
       return {
         'eventId': id,
-        'setNumber': i,
         'weight': s.weight,
         'repetition': s.rep,
       };

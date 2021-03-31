@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       builder: (ctx, _) => MaterialApp(
-        title: 'WorkOut_Tracker',
+        title: 'muppler',
         //* Theme *//
         theme: ThemeData(
           buttonTheme: ButtonThemeData(

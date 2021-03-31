@@ -17,7 +17,7 @@ class DailyTitle extends StatelessWidget {
   // ************ build daily title  (month/day, events summary, satsifaction) ************ //
   @override
   Widget build(BuildContext context) {
-    print('build dailyTitle!');
+    // print('build dailyTitle!');
     final events = Provider.of<Events>(context);
     final today = Provider.of<CalendarState>(context).day;
     final filters = Provider.of<Filters>(context).items;

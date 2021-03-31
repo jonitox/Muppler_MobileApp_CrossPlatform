@@ -1,8 +1,7 @@
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqlite_api.dart';
-
-import '../models/event.dart';
+import 'package:uuid/uuid.dart';
 
 class DBHelper {
   /// create Database
@@ -13,27 +12,64 @@ class DBHelper {
     const _createEventsTable =
         'CREATE TABLE events (id TEXT PRIMARY KEY, exerciseId TEXT, memo TEXT, date TEXT, type INTEGER)';
     const _createSetsTable =
-        'CREATE TABLE sets (id INTEGER PRIMARY KEY, eventId TEXT, setNumber INTEGER, weight REAL, repetition INTEGER)'; // auto increment? // setNumber
+        'CREATE TABLE sets (id INTEGER PRIMARY KEY, eventId TEXT, weight REAL, repetition INTEGER)';
     const _createRoutinesTable =
-        'CREATE TABLE routines (id TEXT PRIMARY KEY, name TEXT)'; // eventNumber?
+        'CREATE TABLE routines (id TEXT PRIMARY KEY, name TEXT)';
     const _createRoutineEventsTable =
-        'CREATE TABLE routineEvents (id TEXT PRIMARY KEY, routineId TEXT, orderNumber INTEGER, exerciseId TEXT, type INTEGER)'; // orderNumber,
+        'CREATE TABLE routineEvents (id TEXT PRIMARY KEY, routineId TEXT, orderNumber INTEGER, exerciseId TEXT, type INTEGER)';
     const _createRoutineSetsTable =
-        'CREATE TABLE routineSets (id INTEGER PRIMARY KEY, routineId TEXT, eventId TEXT, setNumber INTEGER, weight REAL, repetition INTEGER)'; // setNumber안씀?
+        'CREATE TABLE routineSets (id INTEGER PRIMARY KEY, routineId TEXT, eventId TEXT, setNumber INTEGER, weight REAL, repetition INTEGER)';
     const _createDaySatisfaction =
         'CREATE TABLE satisfaction (date TEXT PRIMARY KEY, figure INTEGER)';
-    // const _createDayMemosTable =
-    //     'CREATE TABLE memos (date TEXT PRIMARY KEY, dayMemo TEXT)';
-    await db.execute(_createEventsTable);
-    await db.execute(_createSetsTable);
-    await db.execute(_createExercisesTable);
-    await db.execute(_createRoutinesTable);
-    await db.execute(_createRoutineEventsTable);
-    await db.execute(_createRoutineSetsTable);
-    await db.execute(_createDaySatisfaction);
-    // await db.execute(_createDayMemosTable);
 
-    // 기본 제공 운동들 입력하기.
+    final batch = db.batch();
+    batch.execute(_createEventsTable);
+    batch.execute(_createSetsTable);
+    batch.execute(_createExercisesTable);
+    batch.execute(_createRoutinesTable);
+    batch.execute(_createRoutineEventsTable);
+    batch.execute(_createRoutineSetsTable);
+    batch.execute(_createDaySatisfaction);
+    var uuid = Uuid();
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '벤치프레스', 'target': 1});
+    batch.insert(
+        'exercises', {'id': uuid.v4(), 'name': '덤벨 벤치프레스', 'target': 1});
+    batch.insert(
+        'exercises', {'id': uuid.v4(), 'name': '인클라인 벤치프레스', 'target': 1});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '딥스', 'target': 1});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '덤벨 플라이', 'target': 1});
+    batch.insert(
+        'exercises', {'id': uuid.v4(), 'name': '펙덱 플라이 머신', 'target': 1});
+    batch.insert(
+        'exercises', {'id': uuid.v4(), 'name': '체스트 프레스 머신', 'target': 1});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '풀업', 'target': 2});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '바벨 로우', 'target': 2});
+    batch.insert(
+        'exercises', {'id': uuid.v4(), 'name': '원암 덤벨 로우', 'target': 2});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '랫풀다운', 'target': 2});
+    batch.insert(
+        'exercises', {'id': uuid.v4(), 'name': '시티드 케이블 로우', 'target': 2});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '스쿼트', 'target': 3});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '레그 프레스', 'target': 3});
+    batch
+        .insert('exercises', {'id': uuid.v4(), 'name': '레그 익스텐션', 'target': 3});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '데드리프트', 'target': 3});
+    batch.insert(
+        'exercises', {'id': uuid.v4(), 'name': '오버헤드 프레스', 'target': 3});
+    batch.insert(
+        'exercises', {'id': uuid.v4(), 'name': '사이드 레터럴 레이즈', 'target': 4});
+    batch.insert(
+        'exercises', {'id': uuid.v4(), 'name': '덤벨 숄더 프레스', 'target': 4});
+    batch.insert(
+        'exercises', {'id': uuid.v4(), 'name': '벤트오버 레터럴 레이즈', 'target': 4});
+    batch
+        .insert('exercises', {'id': uuid.v4(), 'name': '프론트 레이즈', 'target': 4});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '덤벨 컬', 'target': 5});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '바벨 컬', 'target': 5});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '해머 컬', 'target': 5});
+    batch.insert(
+        'exercises', {'id': uuid.v4(), 'name': '케이블 푸쉬 다운', 'target': 5});
+    await batch.commit();
   }
 
   /// get database

@@ -79,7 +79,7 @@ class Routines with ChangeNotifier {
     );
 
     _items = loadedRoutines;
-    print(_items);
+    // print(_items);
     notifyListeners(); //
   }
 
@@ -89,7 +89,7 @@ class Routines with ChangeNotifier {
         id: uuid.v4(),
         name: name,
         items: items.map((e) => e.copyWith(id: uuid.v4())).toList());
-    print(_items);
+    // print(_items);
     _items.add(newRoutine);
     notifyListeners();
     DBHelper.insertRoutine(newRoutine.routineToMap(), newRoutine.eventsToList(),
@@ -107,8 +107,7 @@ class Routines with ChangeNotifier {
     _items.forEach((r) {
       if (r.containExercise(exerciseId)) {
         routineIdsOfExercise.add(r.id);
-        print('있대!!');
-        print(r.name);
+        // print(r.name);
       }
     });
     _items.removeWhere((r) => r.containExercise(exerciseId));

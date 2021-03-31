@@ -1,4 +1,4 @@
-name: work_out_tracker
+name: muppler
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -42,7 +42,9 @@ dev_dependencies:
 flutter_icons:  
   android: true
   ios: true
-  image_path:
+  image_path: 'assets/icons/appIcon.png'
+  adaptive_icon_foreground: 'assets/icons/appIcon_adaptive.png'
+  adaptive_icon_background: '#8f34eb'
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

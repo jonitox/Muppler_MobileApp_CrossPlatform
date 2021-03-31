@@ -28,7 +28,7 @@ class _MemoDialogState extends State<MemoDialog> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: deviceSize.width * 0.3),
+              constraints: BoxConstraints(maxWidth: deviceSize.width * 0.4),
               child: Text(
                 '${widget.exerciseName}',
                 softWrap: false,

@@ -36,7 +36,7 @@ class TabScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-    print('build tapScreen!');
+    // print('build tapScreen!');
     return Scaffold(
       appBar: AppBar(
         title: Consumer<TapPageIndex>(

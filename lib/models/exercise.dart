@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 class Target {
   String value;
   Target(this.value);

@@ -23,7 +23,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // initState //
   @override
   void initState() {
-    print('init Calendar Screen!');
+    // print('init Calendar Screen!');
     _calendarController = CalendarController();
     super.initState();
   }
@@ -31,7 +31,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // dispose //
   @override
   void dispose() {
-    print('dispose Calendar Screen!');
+    // print('dispose Calendar Screen!');
     _calendarController.dispose();
     super.dispose();
   }
@@ -39,7 +39,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // *************** build Calendar Screen ***************** //
   @override
   Widget build(BuildContext context) {
-    print('build Calendar Screen!');
+    // print('build Calendar Screen!');
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[

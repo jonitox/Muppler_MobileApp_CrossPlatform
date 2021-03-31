@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
-import './events.dart';
 import '../models/exercise.dart';
 import '../helpers/dbhelper.dart';
 

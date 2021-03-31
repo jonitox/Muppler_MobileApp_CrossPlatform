@@ -88,7 +88,7 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
   // ******************** build insert events screen ******************** //
   @override
   Widget build(BuildContext context) {
-    print('build Insert Events Screen!');
+    // print('build Insert Events Screen!');
     final stopwatch = Provider.of<StopWatchState>(context);
     final themeData = Theme.of(context);
     // appBar of Insert Event screen
@@ -432,7 +432,7 @@ class _InsertEventsScreenState extends State<InsertEventsScreen> {
 
   // ************ job complete buttons ************ //
   Widget jobCompleteRow(ThemeData themeData) {
-    print('create jobcomplete row!');
+    // print('create jobcomplete row!');
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

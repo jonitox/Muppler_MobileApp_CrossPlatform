@@ -9,7 +9,7 @@ class PickExerciseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('build ChooseExScreen!');
+    // print('build ChooseExScreen!');
     return DefaultTabController(
       length: 2,
       child: Scaffold(

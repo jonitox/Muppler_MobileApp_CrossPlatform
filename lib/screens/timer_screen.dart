@@ -94,11 +94,13 @@ class TimerScreen extends StatelessWidget {
           Flexible(
             fit: FlexFit.tight,
             flex: 2,
-            child: Center(
-              child: Text(
-                timeSegs['min'],
-                style: themeData.textTheme.headline3
-                    .copyWith(fontSize: stopwatch.isOnOverlay ? 18 : 50),
+            child: FittedBox(
+              child: Center(
+                child: Text(
+                  timeSegs['min'],
+                  style: themeData.textTheme.headline3
+                      .copyWith(fontSize: stopwatch.isOnOverlay ? 18 : 50),
+                ),
               ),
             ),
           ),
@@ -116,11 +118,13 @@ class TimerScreen extends StatelessWidget {
           Flexible(
             fit: FlexFit.tight,
             flex: 2,
-            child: Center(
-              child: Text(
-                timeSegs['sec'],
-                style: themeData.textTheme.headline3
-                    .copyWith(fontSize: stopwatch.isOnOverlay ? 18 : 50),
+            child: FittedBox(
+              child: Center(
+                child: Text(
+                  timeSegs['sec'],
+                  style: themeData.textTheme.headline3
+                      .copyWith(fontSize: stopwatch.isOnOverlay ? 18 : 50),
+                ),
               ),
             ),
           ),

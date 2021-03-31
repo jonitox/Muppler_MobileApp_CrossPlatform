@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:work_out_tracker/screens/insert_events_screen.dart';
 
 import '../providers/exercises.dart';
 import '../providers/routines.dart';
 import '../screens/choose_exs_for_routine_screen.dart';
+import '../screens/insert_events_screen.dart';
 import './custom_floating_button.dart';
 import '../models/event.dart';
 import '../models/exercise.dart';
@@ -31,16 +31,18 @@ class _RoutineListState extends State<RoutineList> {
         Divider(),
         if (widget.isForinsert)
           floatingButton(
-            text: '선택 완료',
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (ctx) => InsertEventsScreen(
-                        isRawInsert: false,
-                        isForRoutine: false,
-                        routineId: selectedId,
-                      )));
-            },
-          ),
+              text: '선택 완료',
+              color: selectedId == null ? Colors.grey : Colors.deepOrange,
+              onPressed: selectedId == null
+                  ? null
+                  : () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (ctx) => InsertEventsScreen(
+                                isRawInsert: false,
+                                isForRoutine: false,
+                                routineId: selectedId,
+                              )));
+                    }),
         if (!widget.isForinsert)
           floatingButton(
             text: '루틴 추가하기',
@@ -53,8 +55,10 @@ class _RoutineListState extends State<RoutineList> {
   }
 
   // ************  floating button ************ //
-  Widget floatingButton({String text, Function onPressed, IconData icon}) {
+  Widget floatingButton(
+      {String text, Function onPressed, IconData icon, Color color}) {
     return CustomFloatingButton(
+      color: color ?? Colors.deepOrange,
       name: text,
       onPressed: onPressed,
       icon: icon,

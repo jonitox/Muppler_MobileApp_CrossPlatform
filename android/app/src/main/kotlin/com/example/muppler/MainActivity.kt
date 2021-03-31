@@ -1,4 +1,4 @@
-package com.example.work_out_tracker
+package com.jsp.muppler
 
 import io.flutter.embedding.android.FlutterActivity
 

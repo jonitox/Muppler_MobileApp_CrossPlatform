@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:work_out_tracker/widgets/custom_floating_button.dart';
 
 import '../providers/exercises.dart';
 import '../providers/filters.dart';
 import '../screens/insert_events_screen.dart';
 import '../models/exercise.dart';
 import './exercise_dialog.dart';
+import './custom_floating_button.dart';
 import './badge.dart';
 
 // ************ exercise list ************ //
@@ -141,15 +141,23 @@ class _ExerciseListState extends State<ExerciseList> {
             floatingButton(
               isBadge: true,
               text: '선택 완료',
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (ctx) => InsertEventsScreen(
-                        isRawInsert: true,
-                        isForRoutine: widget.isForRoutine,
-                        exerciseIds: isSelected.entries
-                            .where((entry) => entry.value == true)
-                            .map((entry) => entry.key)
-                            .toList(),
-                      ))),
+              color: isSelected.containsValue(true)
+                  ? Colors.deepOrange
+                  : Colors.grey,
+              onPressed: isSelected.containsValue(true)
+                  ? () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (ctx) => InsertEventsScreen(
+                            isRawInsert: true,
+                            isForRoutine: widget.isForRoutine,
+                            exerciseIds: isSelected.entries
+                                .where((entry) => entry.value == true)
+                                .map((entry) => entry.key)
+                                .toList(),
+                          ),
+                        ),
+                      )
+                  : null,
             ),
         ],
       );
@@ -313,8 +321,13 @@ class _ExerciseListState extends State<ExerciseList> {
 
   // ************ floating button ************ //
   Widget floatingButton(
-      {bool isBadge, String text, Function onPressed, IconData icon}) {
+      {bool isBadge,
+      String text,
+      Function onPressed,
+      IconData icon,
+      Color color}) {
     final btn = CustomFloatingButton(
+      color: color ?? Colors.deepOrange,
       name: text,
       onPressed: onPressed,
       icon: icon,

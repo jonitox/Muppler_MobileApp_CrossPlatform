@@ -36,9 +36,6 @@ class Events with ChangeNotifier {
     fetchedEvents.forEach((event) {
       final setsOfEvent =
           fetchedSets.where((s) => s['eventId'] == event['id']).toList();
-      // ..sort((a, b) =>
-      //     a['setNumber'] <
-      //     b['setNumber']); // ? dart pad 실험. // 추가된순서로있으니까 불필요할지도.
       loadedEvents.add(Event(
         id: event['id'],
         date: DateTime.parse(event['date']),

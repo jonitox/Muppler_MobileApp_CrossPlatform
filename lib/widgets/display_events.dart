@@ -24,7 +24,7 @@ class DisplayEvents extends StatelessWidget {
 // ************ build event list ************ //
   @override
   Widget build(BuildContext context) {
-    print('build display events!');
+    // print('build display events!');
     final events = Provider.of<Events>(context);
     final filters = Provider.of<Filters>(context);
     List<Event> eventsToShow;
