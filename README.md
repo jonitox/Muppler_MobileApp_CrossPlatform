@@ -37,3 +37,5 @@
 - dismissable    
 - 메모리 leak check.   
 - timer provider에 is_running 필요x    
+
+연락처: 010-8576-8390, jonitox94@naver.com
