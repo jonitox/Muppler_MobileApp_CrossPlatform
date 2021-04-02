@@ -19,7 +19,7 @@ A new Flutter project.
 # 디버그, 최적화
 - test,image등 fittedBox로 wrap하여 사용(혹은 overflow지정?)
 - onUnknownRoute추가
-- InkWell 사용할만한 곳?: 오늘의운동관리하러가기?
+- InkWell 사용할만한 곳?
 - 코드간결화 및 정리. split widgets, builder method. 
 - 생성자로 passing하는 변수명 같게 유지하지말고 조금씩 다르게.
 - listview children -> builder(운동종목숫자 모를시.) / listview.separated   
@@ -27,16 +27,14 @@ A new Flutter project.
 - event tile의 set column을 listview로하고 listview의 container의 height을 min(갯수*20+10, 100)으로 설정. 일정크기넘어가면 scroll하게.    
 - Form 개선. TextInputActioin.next /       
 - FocusNode 사용가능하면 추가, unFocus()도   
-- Form 개선. TextInputActioin.next / validator 수정.(value.isEmpty, can parse double etc)     
-- future, then -> async, await으로 수정. error는 try&catch,throw으로 관리.      
+- Form 개선. TextInputActioin.next / validator 수정.(value.isEmpty, can parse double etc)         
 - hero 사용가능하면 추가    
-- 페이지 pop할때 받을 객체의 타입을 as말고 push<T>로 명시. 
+- 페이지 pop할때 받을 객체의 타입을 as말고 push<T>로 명시.   
 - Function 생성자로 전달시, 받는 클래스 내에서 함수 형태를 규정.      
 - input에 trim()추가.      
 - pageTransition/ customRoute
 - LayoutBuilder    
-- dismissable
 - 공유 기능
 - dismissable    
-- 메모리 leak안생기는지 확인.   
+- 메모리 leak check.   
 - timer provider에 is_running 필요x    
