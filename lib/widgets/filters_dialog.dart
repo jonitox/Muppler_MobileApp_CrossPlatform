@@ -15,7 +15,7 @@ class FiltersDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       title: FittedBox(
         child: const Text(
-          '달력에 표시될 운동을 변경해보세요.',
+          '체크된 운동만 달력에 표시됩니다',
           overflow: TextOverflow.visible,
           softWrap: true,
           maxLines: 2,

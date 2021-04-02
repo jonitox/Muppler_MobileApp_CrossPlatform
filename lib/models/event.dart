@@ -82,7 +82,6 @@ class Event {
   List<Map<String, dynamic>> setsToList() {
     // id INTEGER PRIMARY KEY, eventId TEXT, weight REAL, repetition INTEGER
     return setDetails.asMap().entries.map((entry) {
-      final i = entry.key;
       final s = entry.value;
       return {
         'eventId': id,

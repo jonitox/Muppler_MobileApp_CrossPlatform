@@ -61,6 +61,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       builder: (ctx, _) => MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'muppler',
         //* Theme *//
         theme: ThemeData(

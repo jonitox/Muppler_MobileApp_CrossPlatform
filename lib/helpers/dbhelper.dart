@@ -50,12 +50,14 @@ class DBHelper {
     batch.insert(
         'exercises', {'id': uuid.v4(), 'name': '시티드 케이블 로우', 'target': 2});
     batch.insert('exercises', {'id': uuid.v4(), 'name': '스쿼트', 'target': 3});
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '데드리프트', 'target': 3});
     batch.insert('exercises', {'id': uuid.v4(), 'name': '레그 프레스', 'target': 3});
     batch
         .insert('exercises', {'id': uuid.v4(), 'name': '레그 익스텐션', 'target': 3});
-    batch.insert('exercises', {'id': uuid.v4(), 'name': '데드리프트', 'target': 3});
+
+    batch.insert('exercises', {'id': uuid.v4(), 'name': '레그 컬', 'target': 3});
     batch.insert(
-        'exercises', {'id': uuid.v4(), 'name': '오버헤드 프레스', 'target': 3});
+        'exercises', {'id': uuid.v4(), 'name': '오버헤드 프레스', 'target': 4});
     batch.insert(
         'exercises', {'id': uuid.v4(), 'name': '사이드 레터럴 레이즈', 'target': 4});
     batch.insert(

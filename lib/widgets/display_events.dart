@@ -104,12 +104,12 @@ class _EventTileState extends State<EventTile> {
             const Divider(
               thickness: 1.5,
             ),
-            if (!isHide) memoBox,
             eventSummary,
             const Divider(
               thickness: 1.5,
             ),
             if (!isHide) eventSetDetails,
+            if (!isHide) memoBox,
           ],
         ),
       ),
@@ -209,6 +209,9 @@ class _EventTileState extends State<EventTile> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        const Divider(
+          thickness: 1.5,
+        ),
         Container(
           margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
           padding: const EdgeInsets.all(5),
@@ -225,9 +228,6 @@ class _EventTileState extends State<EventTile> {
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
           ),
-        ),
-        const Divider(
-          thickness: 1.5,
         ),
       ],
     ); // 컨
