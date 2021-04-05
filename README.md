@@ -1,4 +1,4 @@
-# Muppler(머슬플래너) - ios 출시, 안드로이드 검토중
+# Muppler(머슬플래너) - App store(ios) 출시, 안드로이드 검토중
 머플러(Muscle Planner)로 운동 계획하고 기록하자!
 
 매일 어떤 운동을 했는지 달력으로 쉽게 확인하고, 
@@ -17,21 +17,20 @@
 - 스탑워치 기능
 - 그날의 만족도 표시
 
-
+<img src="/path/to/img.jpg" width="450px" height="300px" title="px(픽셀) 크기 설정" alt="RubberDuck"></img><br/>
 
 # 개발환경    
 flutter
 
 
 # To update later..     
-- 애니메이션 추가  (Tile(축소/확대),)
+- 애니메이션 추가  (Tile(축소/확대),)    
 - 폰트 추가         
 - 운동부위 카테고리 관리 기능.    
-- 설정 페이지: 운동목록 이름순 정렬. 날짜순 정렬. / 
-- 각종 device에 test(keyboard 렌더링될 때, Text(kg,횟수 등) 범위가 초과할때(:overflow 추가) 등등 layout확인)
-- 달성률 저장 기능
-- 카운터 기능, 타이머 기능   
-- 아이폰 고려. safeArea.    
+- 설정 페이지: / kg,lb /    
+- 운동목록 정렬 /    
+- 달성률 저장 기능    
+- 타이머 시간 셋업, 알림기능    
 ---------------------------------
 # 디버그, 최적화
 - performance 최적화(build함수내 print활용하여별 동작별 위젯의 빌드여부 확인. / const위젯)
