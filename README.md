@@ -1,4 +1,4 @@
-# Muppler(머슬플래너) - App store(ios) 출시, 안드로이드 검토중
+# Muppler(머슬플래너) - Android/IOS       
 머플러(Muscle Planner)로 운동 계획하고 기록하자!
 
 매일 어떤 운동을 했는지 달력으로 쉽게 확인하고, 
@@ -17,43 +17,36 @@
 - 스탑워치 기능
 - 그날의 만족도 표시
 
-<img src="/path/to/img.jpg" width="450px" height="300px" title="px(픽셀) 크기 설정" alt="RubberDuck"></img><br/>
+IOS      
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 1.png" width="150px" height="300px" alt="1"></img>
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 2.png" width="150px" height="300px" alt="1"></img>
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 3.png" width="150px" height="300px" alt="1"></img>
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 4.png" width="150px" height="300px" alt="1"></img>
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 5.png" width="150px" height="300px" alt="1"></img>
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 6.png" width="150px" height="300px" alt="1"></img>
+
+Android    
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 1.png" width="150px" height="300px" alt="1"></img>
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 2.png" width="150px" height="300px" alt="1"></img>
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 3.png" width="150px" height="300px" alt="1"></img>
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 4.png" width="150px" height="300px" alt="1"></img>
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 5.png" width="150px" height="300px" alt="1"></img>
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 6.png" width="150px" height="300px" alt="1"></img>
+
 
 # 개발환경    
-flutter
+flutter 2.0.1     
 
 
-# To update later..     
+# To update more..     
 - 애니메이션 추가  (Tile(축소/확대),)    
 - 폰트 추가         
-- 운동부위 카테고리 관리 기능.    
+- 운동부위 카테고리 관리 기능. 
+- set 입력종류에 시간 추가.       
 - 설정 페이지: / kg,lb /    
 - 운동목록 정렬 /    
 - 달성률 저장 기능    
 - 타이머 시간 셋업, 알림기능    
 ---------------------------------
-# 디버그, 최적화
-- performance 최적화(build함수내 print활용하여별 동작별 위젯의 빌드여부 확인. / const위젯)
-- test,image등 fittedBox로 wrap하여 사용(혹은 overflow지정?)
-- onUnknownRoute추가
-- InkWell 사용할만한 곳?
-- 코드간결화 및 정리. split widgets, builder method. 
-- 생성자로 passing하는 변수명 같게 유지하지말고 조금씩 다르게.
-- listview children -> builder(운동종목숫자 모를시.) / listview.separated   
-- map의 key가 없을때 추가시 -> putIfAbsent / value update 시 -> update     
-- event tile의 set column을 listview로하고 listview의 container의 height을 min(갯수*20+10, 100)으로 설정. 일정크기넘어가면 scroll하게.    
-- Form 개선. TextInputActioin.next /       
-- FocusNode 사용가능하면 추가, unFocus()도   
-- Form 개선. TextInputActioin.next / validator 수정.(value.isEmpty, can parse double etc)         
-- hero 사용가능하면 추가    
-- 페이지 pop할때 받을 객체의 타입을 as말고 push<T>로 명시.   
-- Function 생성자로 전달시, 받는 클래스 내에서 함수 형태를 규정.      
-- input에 trim()추가.      
-- pageTransition/ customRoute
-- LayoutBuilder    
-- 공유 기능
-- dismissable    
-- 메모리 leak check.   
-- timer provider에 is_running 필요x    
 
 연락처: 010-8576-8390, jonitox94@naver.com
