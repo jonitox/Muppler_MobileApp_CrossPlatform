@@ -31,6 +31,7 @@ class DBHelper {
     batch.execute(_createRoutineSetsTable);
     batch.execute(_createDaySatisfaction);
     var uuid = Uuid();
+    // 초기 운동 목록 생성.
     batch.insert('exercises', {'id': uuid.v4(), 'name': '벤치프레스', 'target': 1});
     batch.insert(
         'exercises', {'id': uuid.v4(), 'name': '덤벨 벤치프레스', 'target': 1});
@@ -109,9 +110,6 @@ class DBHelper {
       await batch.commit();
     });
   }
-
-  /// insert events of routine
-  // static Future<void> insertEventsOfRoutine(
 
   // insert events
   static Future<void> insertEvents(
