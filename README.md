@@ -35,7 +35,7 @@ Android
 
 
 # 개발환경    
-flutter 2.0.1     
+### flutter(Dart) 2.0.1     
 
 
 # To update more..     
