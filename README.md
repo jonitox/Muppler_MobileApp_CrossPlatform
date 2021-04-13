@@ -18,21 +18,21 @@
 - 스탑워치 기능
 - 그날의 만족도 표시
 
-IOS      
-<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 1.png" width="140px" height="270px" alt="1"></img>
-<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 2.png" width="140px" height="270px" alt="1"></img>
-<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 3.png" width="140px" height="270px" alt="1"></img>
-<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 4.png" width="140px" height="270px" alt="1"></img>
-<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 5.png" width="140px" height="270px" alt="1"></img>
-<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 6.png" width="140px" height="270px" alt="1"></img>
+IOS : https://apps.apple.com/kr/app/muppler-%EB%A8%B8%EC%8A%AC%ED%94%8C%EB%9E%98%EB%84%88/id1561108919     
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 1.png" width="150px" height="280px" alt="1"></img>
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 2.png" width="150px" height="280px" alt="1"></img>
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 3.png" width="150px" height="280px" alt="1"></img>
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 4.png" width="150px" height="280px" alt="1"></img>
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 5.png" width="150px" height="280px" alt="1"></img>
+<img src="/screenshots/screenshots-ios/app-screenshots/6.5-inch Screenshot 6.png" width="150px" height="280px" alt="1"></img>
 
-Android    
-<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 1.png" width="140px" height="270px" alt="1"></img>
-<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 2.png" width="140px" height="270px" alt="1"></img>
-<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 3.png" width="140px" height="270px" alt="1"></img>
-<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 4.png" width="140px" height="270px" alt="1"></img>
-<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 5.png" width="140px" height="270px" alt="1"></img>
-<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 6.png" width="140px" height="270px" alt="1"></img>
+Android : https://play.google.com/store/apps/details?id=com.jsp.muppler    
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 1.png" width="150px" height="280px" alt="1"></img>
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 2.png" width="150px" height="280px" alt="1"></img>
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 3.png" width="150px" height="280px" alt="1"></img>
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 4.png" width="150px" height="280px" alt="1"></img>
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 5.png" width="150px" height="280px" alt="1"></img>
+<img src="/screenshots/screenshots-android/app-screenshots 4/Phone Screenshot 6.png" width="150px" height="280px" alt="1"></img>
 
 
 # 개발환경    
